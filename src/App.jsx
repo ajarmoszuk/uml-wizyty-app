@@ -6,6 +6,7 @@ import StepConfirm from './components/StepConfirm.jsx'
 import TopBar from './components/TopBar.jsx'
 import LodzCOA from './components/LodzCOA.jsx'
 import { useT } from './i18n.jsx'
+import Icon from './components/Icon.jsx'
 
 function useSystemBanners() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine)
@@ -58,9 +59,9 @@ export default function App() {
   const [ticket, setTicket] = useState(null)
 
   const STEPS = [
-    { icon: '📅', labelKey: 'step0' },
-    { icon: '👤', labelKey: 'step1' },
-    { icon: '📱', labelKey: 'step2' },
+    { icon: 'calendar', labelKey: 'step0' },
+    { icon: 'user', labelKey: 'step1' },
+    { icon: 'smartphone', labelKey: 'step2' },
   ]
 
   function reset() {
@@ -76,12 +77,12 @@ export default function App() {
 
         {/* System banners */}
         {banners.showOffline && (
-          <SystemBanner icon="📡" color="var(--red)" bg="var(--red-light)" onDismiss={banners.dismissOffline}>
+          <SystemBanner icon="wifi-off" color="var(--red)" bg="var(--red-light)" onDismiss={banners.dismissOffline}>
             {t('bannerOffline')}
           </SystemBanner>
         )}
         {banners.showMaintenance && (
-          <SystemBanner icon="🔧" color="var(--orange)" bg="var(--orange-light)" onDismiss={banners.dismissMaintenance}>
+          <SystemBanner icon="wrench" color="var(--orange)" bg="var(--orange-light)" onDismiss={banners.dismissMaintenance}>
             {banners.isConnectionReset ? t('bannerConnectionReset') : t('bannerMaintenance')}
           </SystemBanner>
         )}
@@ -116,18 +117,15 @@ export default function App() {
                   <React.Fragment key={i}>
                     <li aria-current={active ? 'step' : undefined} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, transition: 'opacity 0.3s', opacity: (!active && !done) ? 0.3 : 1 }}>
                       <div style={{
-                        width: active ? 48 : 40, height: active ? 48 : 40,
+                        width: 36, height: 36,
                         borderRadius: '50%',
                         background: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--surface2)',
-                        border: `2.5px solid ${active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--border)'}`,
+                        border: `2px solid ${active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--border)'}`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: done ? 16 : active ? 20 : 17,
                         color: (active || done) ? 'white' : 'var(--text-3)',
-                        fontWeight: 900,
                         transition: 'all 0.3s',
-                        boxShadow: active ? '0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent)' : 'none',
                       }} aria-hidden="true">
-                        {done ? '✓' : s.icon}
+                        {done ? <Icon name="check" size={16} /> : <Icon name={s.icon} size={16} />}
                       </div>
                       <span style={{ fontSize: 12, fontWeight: active ? 800 : 600, color: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--text-3)', whiteSpace: 'nowrap' }}>
                         {t(s.labelKey)}
@@ -164,8 +162,8 @@ export default function App() {
 
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: 'var(--text-3)', lineHeight: 1.8 }}>
           <div>{t('unofficial')}</div>
-          <div style={{ fontSize: 11, color: 'var(--text-3)', opacity: 0.75, fontFamily: 'monospace', marginTop: 2 }}>
-            🔒 {t('proxyNote')}
+          <div style={{ fontSize: 11, color: 'var(--text-3)', opacity: 0.75, fontFamily: 'monospace', marginTop: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+            <Icon name="lock" size={11} /> {t('proxyNote')}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
             <span>© 2026 Aleksander Jarmoszuk</span>
@@ -204,17 +202,17 @@ function SystemBanner({ icon, color, bg, onDismiss, children }) {
       borderRadius: 12, padding: '12px 14px',
       marginBottom: 16, color,
     }}>
-      <span style={{ fontSize: 18, lineHeight: 1.4, flexShrink: 0 }} aria-hidden="true">{icon}</span>
+      <Icon name={icon} size={18} style={{ flexShrink: 0, marginTop: 2 }} />
       <span style={{ flex: 1, fontSize: 14, fontWeight: 600, lineHeight: 1.55 }}>{children}</span>
       <button
         onClick={onDismiss}
         aria-label={t('bannerDismiss')}
         style={{
           background: 'none', border: 'none', cursor: 'pointer',
-          color, fontSize: 18, lineHeight: 1, padding: '0 2px', flexShrink: 0,
-          fontFamily: 'var(--font)', fontWeight: 700,
+          color, padding: '0 2px', flexShrink: 0,
+          display: 'flex', alignItems: 'center',
         }}
-      >×</button>
+      ><Icon name="x" size={18} /></button>
     </div>
   )
 }

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { fetchRangeAvailability, fetchSlots, SERVICES, CATEGORY_META } from '../api/booking.js'
 import { useT, useLang, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../i18n.jsx'
+import Icon from './Icon.jsx'
 
 function toDateStr(d) {
   const y = d.getFullYear()
@@ -86,9 +87,9 @@ function BookingRules() {
         }}
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <span aria-hidden="true">📋</span> {t('rulesToggle')}
+          <Icon name="clipboard-list" size={16} /> {t('rulesToggle')}
         </span>
-        <span style={{ fontSize: 11, color: 'var(--text-3)', transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none' }} aria-hidden="true">▼</span>
+        <Icon name="chevron-down" size={14} style={{ color: 'var(--text-3)', transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }} />
       </button>
       {open && (
         <div style={{ padding: '16px 18px 18px', background: 'var(--surface)' }}>
@@ -104,14 +105,14 @@ function BookingRules() {
               target="_blank" rel="noopener noreferrer"
               style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: 5 }}
             >
-              <span aria-hidden="true">🔒</span> {t('rule6')}
+              <Icon name="lock" size={14} /> {t('rule6')}
             </a>
             <a
               href="https://bip.uml.lodz.pl/inne-informacje/polityka-prywatnosci/"
               target="_blank" rel="noopener noreferrer"
               style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: 5 }}
             >
-              <span aria-hidden="true">📄</span> {t('rule7')}
+              <Icon name="file-text" size={14} /> {t('rule7')}
             </a>
           </div>
         </div>
@@ -197,7 +198,7 @@ export default function StepSlots({ onSelect }) {
 
   // ── OFFICE PICKER ───────────────────────────────────────────────────────
   if (!selectedService && pendingGroupServices) {
-    const groupMeta = CATEGORY_META[pendingGroupServices[0].category] || { icon: '📋', color: '#2563eb' }
+    const groupMeta = CATEGORY_META[pendingGroupServices[0].category] || { icon: 'clipboard-list', color: '#2563eb' }
     return (
       <div className="fade-up" style={{ padding: '32px 28px' }}>
         <button onClick={() => setPendingGroupServices(null)} style={{
@@ -205,11 +206,11 @@ export default function StepSlots({ onSelect }) {
           fontSize: 13, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font)',
           display: 'flex', alignItems: 'center', gap: 4,
         }}>
-          ← {t('changeService')}
+          <Icon name="chevron-left" size={16} /> {t('changeService')}
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <span style={{ fontSize: 26 }} aria-hidden="true">{pendingGroupServices[0].icon}</span>
+          <Icon name={groupMeta.icon} size={24} style={{ color: groupMeta.color, flexShrink: 0 }} />
           <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
             {svcLabel(pendingGroupServices[0])}
           </h2>
@@ -246,7 +247,7 @@ export default function StepSlots({ onSelect }) {
               }}
               aria-label={`${officeLabel(svc)}, ${svc.address}`}
             >
-              <span style={{ fontSize: 28, flexShrink: 0 }} aria-hidden="true">📍</span>
+              <Icon name="map-pin" size={22} style={{ color: groupMeta.color, flexShrink: 0 }} />
               <span>
                 <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>
                   {officeLabel(svc)}
@@ -255,7 +256,7 @@ export default function StepSlots({ onSelect }) {
                   {svc.address}
                 </span>
               </span>
-              <span style={{ fontSize: 22, color: 'var(--text-3)', marginLeft: 'auto', flexShrink: 0 }} aria-hidden="true">›</span>
+              <Icon name="chevron-right" size={18} style={{ color: 'var(--text-3)', marginLeft: 'auto', flexShrink: 0 }} />
             </button>
           ))}
         </div>
@@ -304,7 +305,7 @@ export default function StepSlots({ onSelect }) {
             // ── CATEGORY GRID ─────────────────────────────────────────────
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
               {CATEGORIES.map(cat => {
-                const meta = CATEGORY_META[cat] || { icon: '📋', color: '#374151' }
+                const meta = CATEGORY_META[cat] || { icon: 'clipboard-list', color: '#374151' }
                 const seen = new Set()
                 const count = SERVICES.filter(s => s.category === cat).filter(s => {
                   const key = s.serviceGroup || s.serviceId
@@ -341,7 +342,7 @@ export default function StepSlots({ onSelect }) {
                     e.currentTarget.style.transform = 'none'
                     e.currentTarget.style.boxShadow = 'none'
                   }}>
-                    <span style={{ fontSize: 36, lineHeight: 1 }} aria-hidden="true">{meta.icon}</span>
+                    <Icon name={meta.icon} size={30} style={{ color: meta.color }} />
                     <span>
                       <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
                       <span style={{ display: 'block', fontSize: 13, color: 'var(--text-2)', fontWeight: 600, marginTop: 3 }}>
@@ -356,7 +357,7 @@ export default function StepSlots({ onSelect }) {
             // ── CATEGORY LIST ─────────────────────────────────────────────
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {CATEGORIES.map(cat => {
-                const meta = CATEGORY_META[cat] || { icon: '📋', color: '#374151' }
+                const meta = CATEGORY_META[cat] || { icon: 'clipboard-list', color: '#374151' }
                 const seenL = new Set()
                 const count = SERVICES.filter(s => s.category === cat).filter(s => {
                   const key = s.serviceGroup || s.serviceId
@@ -389,14 +390,14 @@ export default function StepSlots({ onSelect }) {
                     e.currentTarget.style.borderColor = 'var(--border)'
                     e.currentTarget.style.borderLeftColor = meta.color
                   }}>
-                    <span style={{ fontSize: 32, lineHeight: 1, flexShrink: 0 }} aria-hidden="true">{meta.icon}</span>
+                    <Icon name={meta.icon} size={24} style={{ color: meta.color, flexShrink: 0 }} />
                     <span style={{ flex: 1 }}>
                       <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
                       <span style={{ display: 'block', fontSize: 13, color: 'var(--text-3)', fontWeight: 600, marginTop: 2 }}>
                         {count} {pluralService(count)}
                       </span>
                     </span>
-                    <span style={{ fontSize: 22, color: 'var(--text-3)', flexShrink: 0, lineHeight: 1 }} aria-hidden="true">›</span>
+                    <Icon name="chevron-right" size={18} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
                   </button>
                 )
               })}
@@ -412,7 +413,7 @@ export default function StepSlots({ onSelect }) {
               fontSize: 13, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font)',
               display: 'flex', alignItems: 'center', gap: 4,
             }}>
-              {t('changeCategory')}
+              <Icon name="chevron-left" size={16} /> {t('changeCategory')}
             </button>
 
             {isGrid ? (
@@ -452,13 +453,13 @@ export default function StepSlots({ onSelect }) {
                       e.currentTarget.style.borderTopColor = meta.color
                       e.currentTarget.style.transform = 'none'
                     }}>
-                      <span style={{ fontSize: 30, lineHeight: 1 }} aria-hidden="true">{svc.icon}</span>
+                      <Icon name={meta.icon} size={24} style={{ color: meta.color }} />
                       <span style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.35 }}>{svcLabel(svc)}</span>
                       {hasMultipleOffices && (() => {
                         const cnt = SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup).length
                         return (
-                          <span style={{ fontSize: 11, color: meta.color, fontWeight: 700, background: `${meta.color}18`, borderRadius: 6, padding: '2px 7px' }}>
-                            📍 {t('officesBadge', cnt)}
+                          <span style={{ fontSize: 11, color: meta.color, fontWeight: 700, background: `${meta.color}18`, borderRadius: 6, padding: '2px 7px', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                            <Icon name="map-pin" size={11} /> {t('officesBadge', cnt)}
                           </span>
                         )
                       })()}
@@ -501,16 +502,16 @@ export default function StepSlots({ onSelect }) {
                       e.currentTarget.style.borderLeftColor = `${meta.color}40`
                       e.currentTarget.style.background = 'var(--surface)'
                     }}>
-                      <span style={{ fontSize: 22, flexShrink: 0 }} aria-hidden="true">{svc.icon}</span>
+                      <Icon name={meta.icon} size={20} style={{ color: meta.color, flexShrink: 0 }} />
                       <span style={{ flex: 1 }}>
                         {svcLabel(svc)}
                         {officeCount > 1 && (
-                          <span style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', fontWeight: 600, marginTop: 2 }}>
-                            📍 {t('officesBadge', officeCount)}
+                          <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: 'var(--text-2)', fontWeight: 600, marginTop: 2 }}>
+                            <Icon name="map-pin" size={12} /> {t('officesBadge', officeCount)}
                           </span>
                         )}
                       </span>
-                      <span style={{ fontSize: 22, color: 'var(--text-3)', flexShrink: 0 }} aria-hidden="true">›</span>
+                      <Icon name="chevron-right" size={18} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
                     </button>
                   )
                 })}
@@ -523,7 +524,7 @@ export default function StepSlots({ onSelect }) {
   }
 
   // ── CALENDAR ────────────────────────────────────────────────────────────
-  const meta = CATEGORY_META[selectedService.category] || { icon: '📋', color: '#2563eb' }
+  const meta = CATEGORY_META[selectedService.category] || { icon: 'clipboard-list', color: '#2563eb' }
   const firstDay = new Date(viewMonth.getFullYear(), viewMonth.getMonth(), 1)
   const startPad = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1
   const daysInMonth = new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 0).getDate()
@@ -542,16 +543,15 @@ export default function StepSlots({ onSelect }) {
         borderRadius: 12, padding: '10px 14px', marginBottom: 24, gap: 12,
       }}>
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: meta.color, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2 }}>
-            <span aria-hidden="true">{meta.icon}</span> {t(CAT_KEY[selectedService.category] || selectedService.category)}
+          <div style={{ fontSize: 11, fontWeight: 700, color: meta.color, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Icon name={meta.icon} size={13} style={{ color: meta.color }} /> {t(CAT_KEY[selectedService.category] || selectedService.category)}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 18 }} aria-hidden="true">{selectedService.icon}</span>
             <div>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{svcLabel(selectedService)}</span>
               {selectedService.address && (
                 <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <span aria-hidden="true">📍</span>
+                  <Icon name="map-pin" size={12} />
                   {selectedService.officeLabel && (
                     <span style={{ fontWeight: 700 }}>{officeLabel(selectedService)} · </span>
                   )}
@@ -610,59 +610,15 @@ export default function StepSlots({ onSelect }) {
         </div>
       )}
 
-      {/* Calendar grid */}
-      <div role="grid" aria-label={`${t('months')[viewMonth.getMonth()]} ${viewMonth.getFullYear()}`} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 28 }}>
-        {cells.map((date, i) => {
-          if (!date) return <div key={i} role="gridcell" />
-          const ds = toDateStr(date)
-          const isPast = date < today
-          const isWeekend = date.getDay() === 0 || date.getDay() === 6
-          const avail = availability[ds]
-          const isSelected = selectedDate === ds
-          const hasSlots = avail > 0
-          const disabled = isPast || isWeekend || avail === 0
-          const monthName = t('months')[date.getMonth()]
-          const dayAriaLabel = isSelected
-            ? `${date.getDate()} ${monthName} — ${t('dayAvail', avail)}, ${t('changeService')}`
-            : hasSlots
-            ? `${date.getDate()} ${monthName} — ${t('dayAvail', avail)}`
-            : `${date.getDate()} ${monthName} — ${t('dayNone')}`
-
-          return (
-            <button key={i}
-              role="gridcell"
-              disabled={disabled}
-              aria-label={dayAriaLabel}
-              aria-pressed={isSelected}
-              aria-disabled={disabled}
-              onClick={() => setSelectedDate(ds)}
-              style={{
-                aspectRatio: '1',
-                border: 'none',
-                borderRadius: 10,
-                fontSize: 15,
-                fontWeight: isSelected ? 900 : hasSlots ? 700 : 400,
-                fontFamily: 'var(--font)',
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                cursor: disabled ? 'default' : 'pointer',
-                transition: 'all var(--transition)',
-                background: isSelected
-                  ? 'var(--accent)'
-                  : hasSlots ? 'var(--accent-light)' : 'transparent',
-                color: isSelected ? 'white'
-                  : hasSlots ? 'var(--accent)'
-                  : 'var(--text-3)',
-                opacity: (isPast || isWeekend) ? 0.25 : 1,
-                outline: 'none',
-              }}>
-              {date.getDate()}
-              {hasSlots && !isSelected && (
-                <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent)', marginTop: 2, opacity: 0.6 }} />
-              )}
-            </button>
-          )
-        })}
-      </div>
+      {/* Calendar grid — roving tabindex for keyboard nav */}
+      <CalendarGrid
+        cells={cells}
+        today={today}
+        availability={availability}
+        selectedDate={selectedDate}
+        onSelectDate={setSelectedDate}
+        t={t}
+      />
 
       {/* Time slots */}
       <div role="region" aria-live="polite" aria-atomic="false" aria-label={t('availableHours')}>
@@ -732,6 +688,106 @@ export default function StepSlots({ onSelect }) {
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, t }) {
+  const gridRef = useRef(null)
+  const dayIndices = cells.reduce((acc, date, i) => { if (date) acc.push(i); return acc }, [])
+  const focusedIdx = selectedDate
+    ? cells.findIndex(d => d && toDateStr(d) === selectedDate)
+    : dayIndices.find(i => {
+        const d = cells[i]
+        const isPast = d < today
+        const isWeekend = d.getDay() === 0 || d.getDay() === 6
+        return !isPast && !isWeekend && (availability[toDateStr(d)] || 0) > 0
+      }) ?? dayIndices[0]
+
+  function moveFocus(fromIdx, delta) {
+    let target = fromIdx + delta
+    while (target >= 0 && target < cells.length) {
+      if (cells[target]) {
+        const btn = gridRef.current?.querySelector(`[data-idx="${target}"]`)
+        if (btn) { btn.focus(); return }
+      }
+      target += delta > 0 ? 1 : -1
+    }
+  }
+
+  function handleKeyDown(e) {
+    const idx = Number(e.currentTarget.dataset.idx)
+    const actions = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7 }
+    if (actions[e.key] !== undefined) {
+      e.preventDefault()
+      moveFocus(idx, actions[e.key])
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      const d = cells[idx]
+      if (d) {
+        const ds = toDateStr(d)
+        const isPast = d < today
+        const isWeekend = d.getDay() === 0 || d.getDay() === 6
+        if (!isPast && !isWeekend && (availability[ds] || 0) > 0) {
+          onSelectDate(ds)
+        }
+      }
+    }
+  }
+
+  return (
+    <div ref={gridRef} role="grid" aria-label={t('months')[cells.find(Boolean)?.getMonth()] + ' ' + cells.find(Boolean)?.getFullYear()} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 28 }}>
+      {cells.map((date, i) => {
+        if (!date) return <div key={i} role="gridcell" />
+        const ds = toDateStr(date)
+        const isPast = date < today
+        const isWeekend = date.getDay() === 0 || date.getDay() === 6
+        const avail = availability[ds]
+        const isSelected = selectedDate === ds
+        const hasSlots = avail > 0
+        const disabled = isPast || isWeekend || avail === 0
+        const monthName = t('months')[date.getMonth()]
+        const dayAriaLabel = isSelected
+          ? `${date.getDate()} ${monthName} — ${t('dayAvail', avail)}, ${t('changeService')}`
+          : hasSlots
+          ? `${date.getDate()} ${monthName} — ${t('dayAvail', avail)}`
+          : `${date.getDate()} ${monthName} — ${t('dayNone')}`
+
+        return (
+          <button key={i}
+            data-idx={i}
+            role="gridcell"
+            tabIndex={i === focusedIdx ? 0 : -1}
+            aria-label={dayAriaLabel}
+            aria-pressed={isSelected}
+            aria-disabled={disabled}
+            onClick={() => { if (!disabled) onSelectDate(ds) }}
+            onKeyDown={handleKeyDown}
+            style={{
+              aspectRatio: '1',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: 15,
+              fontWeight: isSelected ? 900 : hasSlots ? 700 : 400,
+              fontFamily: 'var(--font)',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              cursor: disabled ? 'default' : 'pointer',
+              transition: 'all var(--transition)',
+              background: isSelected
+                ? 'var(--accent)'
+                : hasSlots ? 'var(--accent-light)' : 'transparent',
+              color: isSelected ? 'white'
+                : hasSlots ? 'var(--accent)'
+                : 'var(--text-3)',
+              opacity: (isPast || isWeekend) ? 0.25 : 1,
+            }}>
+            {date.getDate()}
+            {hasSlots && !isSelected && (
+              <div style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent)', marginTop: 2, opacity: 0.6 }} />
+            )}
+          </button>
+        )
+      })}
     </div>
   )
 }

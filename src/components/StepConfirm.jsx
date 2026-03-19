@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { useT } from '../i18n.jsx'
+import Icon from './Icon.jsx'
 
 export default function StepConfirm({ booking, ticket, onReset }) {
   const t = useT()
@@ -19,13 +20,13 @@ export default function StepConfirm({ booking, ticket, onReset }) {
     <div className="fade-up" style={{ padding: '40px 28px', textAlign: 'center', maxWidth: 520, margin: '0 auto' }}>
 
       <div style={{
-        width: 80, height: 80, borderRadius: '50%',
+        width: 72, height: 72, borderRadius: '50%',
         background: 'var(--green-light)', border: '3px solid var(--green)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: 36, margin: '0 auto 20px',
+        color: 'var(--green)', margin: '0 auto 20px',
         animation: 'popIn 0.4s ease both',
       }} aria-hidden="true">
-        ✅
+        <Icon name="circle-check" size={36} />
       </div>
 
       <h2 ref={headingRef} tabIndex={-1} style={{ fontSize: 26, fontWeight: 900, color: 'var(--green)', marginBottom: 8, letterSpacing: '-0.02em', outline: 'none' }}>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useLang, useTheme, useT } from '../i18n.jsx'
 import AboutModal from './AboutModal.jsx'
+import Icon from './Icon.jsx'
 
 const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
 
@@ -69,7 +70,7 @@ export default function TopBar() {
           }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}>
-          <span style={{ fontSize: 15 }} aria-hidden="true">ℹ</span>
+          <Icon name="info" size={15} />
           {t('about')}
         </button>
 

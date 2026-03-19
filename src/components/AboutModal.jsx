@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useT } from '../i18n.jsx'
+import Icon from './Icon.jsx'
 
 const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
 
@@ -13,17 +14,36 @@ function GitHubIcon() {
 
 export default function AboutModal({ onClose }) {
   const t = useT()
+  const modalRef = useRef(null)
 
   useEffect(() => {
-    function onKey(e) { if (e.key === 'Escape') onClose() }
+    const prev = document.activeElement
+    const modal = modalRef.current
+    const focusable = modal?.querySelectorAll('button, a[href], input, [tabindex]:not([tabindex="-1"])')
+    if (focusable?.length) focusable[0].focus()
+
+    function onKey(e) {
+      if (e.key === 'Escape') { onClose(); return }
+      if (e.key !== 'Tab' || !focusable?.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus() }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus() }
+    }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      prev?.focus()
+    }
   }, [onClose])
 
   return (
     <div
       className="fade-in"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('aboutTitle')}
       style={{
         position: 'fixed', inset: 0, zIndex: 1000,
         background: 'var(--modal-overlay)',
@@ -32,6 +52,7 @@ export default function AboutModal({ onClose }) {
         backdropFilter: 'blur(4px)',
       }}>
       <div
+        ref={modalRef}
         className="pop-in"
         onClick={e => e.stopPropagation()}
         style={{
@@ -54,13 +75,12 @@ export default function AboutModal({ onClose }) {
               {t('aboutTagline')}
             </p>
           </div>
-          <button onClick={onClose} style={{
+          <button onClick={onClose} aria-label={t('close')} style={{
             flexShrink: 0, width: 32, height: 32, borderRadius: '50%',
             background: 'var(--surface2)', border: '1px solid var(--border)',
-            cursor: 'pointer', fontSize: 16, color: 'var(--text-3)',
+            cursor: 'pointer', color: 'var(--text-3)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font)',
-          }}>×</button>
+          }}><Icon name="x" size={16} /></button>
         </div>
 
         {/* Body */}
@@ -93,7 +113,7 @@ export default function AboutModal({ onClose }) {
           borderRadius: 10, padding: '14px 16px', marginBottom: 16,
           display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
         }}>
-          <span style={{ fontSize: 20, lineHeight: 1 }} aria-hidden="true">👋</span>
+          <Icon name="handshake" size={20} style={{ color: 'var(--green)', flexShrink: 0 }} />
           <span style={{ flex: 1, minWidth: 0 }}>
             <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: 'var(--green)', marginBottom: 2 }}>
               {t('hireMe')}

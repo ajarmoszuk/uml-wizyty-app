@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { sendVerificationCode, takeAppointment } from '../api/booking.js'
 import { BackBtn, primaryBtn } from './StepDetails.jsx'
 import { useT } from '../i18n.jsx'
+import Icon from './Icon.jsx'
 
 export default function StepVerify({ booking, details, onSuccess, onBack }) {
   const t = useT()
@@ -127,8 +128,8 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
               {t('terms2')}
             </ConsentBox>
             {termsError && (
-              <p role="alert" style={{ fontSize: 13, color: 'var(--red)', fontWeight: 600, margin: 0 }}>
-                ⚠ {t('termsRequired')}
+              <p role="alert" style={{ fontSize: 13, color: 'var(--red)', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
+                <Icon name="alert" size={14} /> {t('termsRequired')}
               </p>
             )}
           </div>
@@ -239,8 +240,9 @@ function ErrorBanner({ children }) {
       background: 'var(--red-light)', border: '1.5px solid var(--red)',
       borderRadius: 10, padding: '12px 16px',
       fontSize: 15, color: 'var(--red)', fontWeight: 600, marginBottom: 16,
+      display: 'flex', alignItems: 'center', gap: 8,
     }}>
-      ⚠ {children}
+      <Icon name="alert" size={18} style={{ flexShrink: 0 }} /> {children}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useT, useLang, useDobHint, useServiceLabel } from '../i18n.jsx'
+import Icon from './Icon.jsx'
 
 const STORAGE_KEY = 'uml_user_data'
 function loadSaved() {
@@ -75,7 +76,7 @@ export default function StepDetails({ booking, onNext, onBack }) {
         marginBottom: 32,
         display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
       }}>
-        <div style={{ fontSize: 32, lineHeight: 1 }} aria-hidden="true">📅</div>
+        <div style={{ lineHeight: 1, color: 'var(--accent)' }} aria-hidden="true"><Icon name="calendar-check" size={28} /></div>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 700, marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('yourSlot')}</div>
           <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--text)' }}>
@@ -98,7 +99,7 @@ export default function StepDetails({ booking, onNext, onBack }) {
           background: 'var(--orange-light)', border: '1.5px solid var(--orange)',
           borderRadius: 12, padding: '12px 14px', marginBottom: 20,
         }}>
-          <span style={{ fontSize: 20, lineHeight: 1.3, flexShrink: 0 }} aria-hidden="true">🗣️</span>
+          <Icon name="message-warning" size={20} style={{ flexShrink: 0, color: 'var(--orange)' }} />
           <div>
             <div style={{ fontSize: 14, fontWeight: 800, color: 'var(--orange)', marginBottom: 3 }}>
               {t('langWarning')}
@@ -183,7 +184,7 @@ export default function StepDetails({ booking, onNext, onBack }) {
         {/* Notification type */}
         <Field id="field-notif" label={t('notifLabel')}>
           <div role="group" aria-label={t('notifLabel')} style={{ display: 'flex', gap: 8 }}>
-            {[{ val: 'email', label: '📧 E-mail' }, { val: 'sms', label: '📱 SMS' }].map(opt => (
+            {[{ val: 'email', icon: 'mail', label: 'E-mail' }, { val: 'sms', icon: 'smartphone', label: 'SMS' }].map(opt => (
               <button key={opt.val} onClick={() => set('notificationType', opt.val)}
                 aria-pressed={form.notificationType === opt.val}
                 style={{
@@ -196,8 +197,9 @@ export default function StepDetails({ booking, onNext, onBack }) {
                   fontFamily: 'var(--font)',
                   fontSize: 15, fontWeight: 700,
                   cursor: 'pointer', transition: 'all var(--transition)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                 }}>
-                {opt.label}
+                <Icon name={opt.icon} size={16} /> {opt.label}
               </button>
             ))}
           </div>
@@ -240,7 +242,7 @@ function Field({ id, label, hint, error, badge, badgeOk, children }) {
         <p id={hintId} style={{ fontWeight: 500, color: 'var(--text-3)', marginBottom: 6, fontSize: 13 }}>{hint}</p>
       )}
       {error && (
-        <p id={msgId} role="alert" style={{ fontWeight: 600, color: 'var(--red)', marginBottom: 6, fontSize: 13 }}>⚠ {error}</p>
+        <p id={msgId} role="alert" style={{ fontWeight: 600, color: 'var(--red)', marginBottom: 6, fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}><Icon name="alert" size={14} /> {error}</p>
       )}
       {children}
     </div>
