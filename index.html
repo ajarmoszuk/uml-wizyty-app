@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ── Primary SEO ─────────────────────────────────────────────────── -->
+    <title>Umów wizytę w Urzędzie Miasta Łodzi | UML Wizyty</title>
+    <meta name="description" content="Prosty i przyjazny formularz do rezerwacji wizyty w Urzędzie Miasta Łodzi. Wybierz usługę, termin i potwierdź przez SMS — bez kolejek i zbędnych kliknięć." />
+    <meta name="keywords" content="Urząd Miasta Łodzi, wizyta, rezerwacja, UML, rejestracja pojazdu, prawo jazdy, dowód osobisty, PESEL, Łódź" />
+    <meta name="author" content="Aleksander Jarmoszuk" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://uml-wizyty.vercel.app/" />
+
+    <!-- ── Language alternates ─────────────────────────────────────────── -->
+    <link rel="alternate" hreflang="pl" href="https://uml-wizyty.vercel.app/" />
+    <link rel="alternate" hreflang="en" href="https://uml-wizyty.vercel.app/" />
+    <link rel="alternate" hreflang="uk" href="https://uml-wizyty.vercel.app/" />
+    <link rel="alternate" hreflang="x-default" href="https://uml-wizyty.vercel.app/" />
+
+    <!-- ── Open Graph ──────────────────────────────────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="UML Wizyty" />
+    <meta property="og:url" content="https://uml-wizyty.vercel.app/" />
+    <meta property="og:title" content="Umów wizytę w Urzędzie Miasta Łodzi" />
+    <meta property="og:description" content="Prosty formularz rezerwacji wizyt w UML — rejestracja pojazdów, prawa jazdy, dowody osobiste i wiele więcej. Obsługa w języku polskim, angielskim i ukraińskim." />
+    <meta property="og:locale" content="pl_PL" />
+    <meta property="og:locale:alternate" content="en_GB" />
+    <meta property="og:locale:alternate" content="uk_UA" />
+
+    <!-- ── Twitter / X Card ────────────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Umów wizytę w Urzędzie Miasta Łodzi" />
+    <meta name="twitter:description" content="Prosty formularz rezerwacji wizyt w UML — po polsku, angielsku i ukraińsku." />
+
+    <!-- ── Theme ───────────────────────────────────────────────────────── -->
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="color-scheme" content="light dark" />
+
+    <!-- ── Structured data (JSON-LD) ──────────────────────────────────── -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "@id": "https://uml-wizyty.vercel.app/#app",
+          "name": "UML Wizyty",
+          "alternateName": "Urząd Miasta Łodzi – Rezerwacja Wizyt",
+          "description": "Nieoficjalny, przyjazny interfejs do rezerwacji wizyt w Urzędzie Miasta Łodzi. Obsługuje rejestrację pojazdów, prawa jazdy, dowody osobiste, podatki i wiele innych usług.",
+          "url": "https://uml-wizyty.vercel.app/",
+          "applicationCategory": "GovernmentApplication",
+          "operatingSystem": "Any",
+          "inLanguage": ["pl", "en", "uk"],
+          "isAccessibleForFree": true,
+          "license": "https://creativecommons.org/licenses/by-sa/4.0/",
+          "author": {
+            "@type": "Person",
+            "name": "Aleksander Jarmoszuk",
+            "email": "alex@jarmosz.uk"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "PLN"
+          },
+          "provider": {
+            "@type": "GovernmentOrganization",
+            "name": "Urząd Miasta Łodzi",
+            "url": "https://uml.lodz.pl",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "ul. Piotrkowska 104",
+              "addressLocality": "Łódź",
+              "postalCode": "90-926",
+              "addressCountry": "PL"
+            }
+          }
+        },
+        {
+          "@type": "GovernmentOrganization",
+          "@id": "https://uml-wizyty.vercel.app/#uml",
+          "name": "Urząd Miasta Łodzi",
+          "url": "https://uml.lodz.pl",
+          "telephone": "+48 42 638 44 44",
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "ul. Piotrkowska 104",
+            "addressLocality": "Łódź",
+            "postalCode": "90-926",
+            "addressCountry": "PL"
+          },
+          "hasMap": "https://maps.google.com/?q=Urząd+Miasta+Łodzi",
+          "openingHoursSpecification": [
+            {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+              "opens": "08:00",
+              "closes": "16:00"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+
+    <!-- ── Fonts ───────────────────────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

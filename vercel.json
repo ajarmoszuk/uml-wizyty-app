@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://wizyty.uml.lodz.pl/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/admin/API/time/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=120, stale-while-revalidate=60"
+        }
+      ]
+    }
+  ]
+}

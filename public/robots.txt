@@ -1,0 +1,20 @@
+User-agent: *
+Allow: /
+
+# AI training crawlers — allow indexing, block training scrapes
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: GoogleOther
+Allow: /
+
+Sitemap: https://uml-wizyty.vercel.app/sitemap.xml

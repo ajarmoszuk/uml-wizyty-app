@@ -1,0 +1,47 @@
+# UML Wizyty
+
+> An unofficial, human-friendly interface for booking appointments at the Łódź City Office (Urząd Miasta Łodzi), Poland.
+> Available in Polish, English, and Ukrainian.
+> Created by Aleksander Jarmoszuk — alex@jarmosz.uk
+> License: CC BY-SA 4.0
+
+## What this is
+
+The official Łódź City Office booking system (wizyty.uml.lodz.pl) has a poor user experience and no multilingual support. This app wraps the same backend API with a clean, accessible, mobile-friendly UI that anyone can use — including residents who do not speak Polish.
+
+All data is sent directly to the official uml.lodz.pl servers. Nothing is collected or stored by this app.
+
+## What you can book
+
+- **Vehicle registration** (rejestracja pojazdu, pojazdów)
+- **Driving licence** matters — new licence, exchange of foreign licence, professional driver qualifications
+- **ID card** applications and collection (dowód osobisty) — multiple office locations
+- **PESEL registration** — including a dedicated service for Ukrainian citizens
+- **Civil registry** (Urząd Stanu Cywilnego) — births, marriages, name changes, record corrections
+- **Taxes and fees** — property tax, agricultural tax, transport vehicle tax, waste disposal fees, stamp duty
+- **Resident Contact Centre** — general enquiries, trusted profile (profil zaufany), large family cards, lost & found
+- **Persons with disabilities** — disability ombudsman meetings, barrier-free card, EU project recruitment
+- **Business activity** — alcohol sales permits, transport licences, CEIDG business registration
+- **Supervision & inspection** — driving schools, vehicle inspection stations
+
+## How booking works
+
+1. Choose a service category and specific service
+2. Pick an available date and time slot from the calendar
+3. Enter personal details (name, phone, date of birth, email)
+4. Accept terms and consent to data processing
+5. Verify your phone number via SMS
+6. Receive booking confirmation with ticket number
+
+## Important notes for non-Polish speakers
+
+Staff at Łódź City Office branches may not speak English or Ukrainian. Users are advised to bring a Polish-speaking person or prepare key phrases in advance.
+
+The system is typically offline for maintenance between 00:00 and 03:00 local time (Europe/Warsaw).
+
+## Technical
+
+- Frontend: React + Vite, deployed on Vercel
+- API: Proxies requests to wizyty.uml.lodz.pl (no backend required)
+- Source: https://github.com/your-repo/uml-wizyty
+- Live app: https://uml-wizyty.vercel.app
