@@ -125,7 +125,7 @@ export default function StepSlots({ onSelect }) {
   const pluralService = usePluralService()
   const svcLabel = useServiceLabel()
   const officeLabel = useOfficeLabel()
-  const today = new Date(); today.setHours(0,0,0,0)
+  const today = new Date(); today.setHours(0,0,0,0); today.setDate(today.getDate() + 1)
 
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('uml_view') || 'grid')
   const [selectedCategory, setSelectedCategory] = useState(null)
