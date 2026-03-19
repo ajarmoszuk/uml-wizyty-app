@@ -1,5 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { fetchRangeAvailability, fetchSlots, SERVICES, CATEGORY_META, serviceDisplayIcon } from '../../api/booking.js'
+import {
+  fetchRangeAvailability,
+  fetchSlots,
+  invalidateServiceSlotCache,
+  SERVICES,
+  CATEGORY_META,
+  serviceDisplayIcon,
+} from '../../api/booking.js'
 import { useT, useLang, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../../i18n'
 import { googleMapsUrl } from '../../utils/googleMaps.js'
 import Icon from '../ui/Icon.jsx'
@@ -218,9 +225,11 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
   const [viewMonth, setViewMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
   const [availability, setAvailability] = useState({})
   const [loadingCal, setLoadingCal] = useState(false)
+  const [calendarLoadFailed, setCalendarLoadFailed] = useState(false)
   const [selectedDate, setSelectedDate] = useState(null)
   const [slots, setSlots] = useState([])
   const [loadingSlots, setLoadingSlots] = useState(false)
+  const [slotsLoadFailed, setSlotsLoadFailed] = useState(false)
 
   function changeViewMode(m) {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
@@ -232,25 +241,65 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
 
   const loadMonth = useCallback(async (month, service) => {
     setLoadingCal(true)
+    setCalendarLoadFailed(false)
     const start = new Date(Math.max(today.getTime(), month.getTime()))
     const end = new Date(month.getFullYear(), month.getMonth() + 1, 0)
     try {
       const avail = await fetchRangeAvailability(service.branchId, service.serviceId, start, end)
-      setAvailability(prev => ({ ...prev, ...avail }))
-    } catch(e) { console.error(e) }
-    setLoadingCal(false)
+      setCalendarLoadFailed(false)
+      setAvailability((prev) => ({ ...prev, ...avail }))
+    } catch (e) {
+      console.error(e)
+      setCalendarLoadFailed(true)
+      setAvailability({})
+      setSelectedDate(null)
+      setSlots([])
+      setSlotsLoadFailed(false)
+    } finally {
+      setLoadingCal(false)
+    }
   }, [])
 
   useEffect(() => {
     if (selectedService) loadMonth(viewMonth, selectedService)
-  }, [viewMonth, selectedService])
+  }, [viewMonth, selectedService, loadMonth])
+
+  const loadSlotsForSelection = useCallback(
+    (bustCache = false) => {
+      if (!selectedDate || !selectedService) {
+        setLoadingSlots(false)
+        return
+      }
+      if (bustCache) {
+        invalidateServiceSlotCache(selectedService.branchId, selectedService.serviceId)
+      }
+      setLoadingSlots(true)
+      setSlots([])
+      setSlotsLoadFailed(false)
+      fetchSlots(selectedService.branchId, selectedService.serviceId, selectedDate)
+        .then((data) => {
+          setSlots(data)
+          setSlotsLoadFailed(false)
+        })
+        .catch((e) => {
+          console.error(e)
+          setSlots([])
+          setSlotsLoadFailed(true)
+        })
+        .finally(() => setLoadingSlots(false))
+    },
+    [selectedDate, selectedService],
+  )
 
   useEffect(() => {
-    if (!selectedDate || !selectedService) return
-    setLoadingSlots(true); setSlots([])
-    fetchSlots(selectedService.branchId, selectedService.serviceId, selectedDate)
-      .then(setSlots).catch(console.error).finally(() => setLoadingSlots(false))
-  }, [selectedDate, selectedService])
+    loadSlotsForSelection(false)
+  }, [selectedDate, selectedService, loadSlotsForSelection])
+
+  const retryCalendar = useCallback(() => {
+    if (!selectedService) return
+    invalidateServiceSlotCache(selectedService.branchId, selectedService.serviceId)
+    loadMonth(viewMonth, selectedService)
+  }, [selectedService, viewMonth, loadMonth])
 
   useEffect(() => {
     if (!guidePick) return
@@ -274,6 +323,8 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
     setSelectedDate(null)
     setSlots([])
     setAvailability({})
+    setCalendarLoadFailed(false)
+    setSlotsLoadFailed(false)
   }
 
   function handleChangeService() {
@@ -283,6 +334,8 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
     setSlots([])
     setAvailability({})
     setPendingGroupServices(null)
+    setCalendarLoadFailed(false)
+    setSlotsLoadFailed(false)
   }
 
   function handleServiceCardClick(svc) {
@@ -670,6 +723,35 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
         </NavBtn>
       </div>
 
+      {calendarLoadFailed && !loadingCal && (
+        <div className="calendar-availability-error" role="alert">
+          <div className="calendar-availability-error__row">
+            <Icon name="wifi-off" size={22} style={{ color: 'var(--orange)', flexShrink: 0, marginTop: 2 }} aria-hidden />
+            <div style={{ minWidth: 0 }}>
+              <p className="calendar-availability-error__title">{t('calendarLoadFailedTitle')}</p>
+              <p className="calendar-availability-error__hint">{t('calendarLoadFailedHint')}</p>
+            </div>
+          </div>
+          <div className="calendar-availability-error__actions">
+            <button
+              type="button"
+              className="calendar-availability-error__btn"
+              onClick={retryCalendar}
+            >
+              {t('retryCalendar')}
+            </button>
+            <a
+              className="calendar-availability-error__link"
+              href={UML_BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t('openOfficialBooking')}
+            </a>
+          </div>
+        </div>
+      )}
+
       {/* Day headers */}
       <div role="row" className="cal-week" style={{ marginBottom: 4 }}>
         {t('days').map(d => (
@@ -694,6 +776,7 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
         availability={availability}
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
+        calendarLoadFailed={calendarLoadFailed && !loadingCal}
         t={t}
       />
 
@@ -711,7 +794,35 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
               </div>
             )}
 
-            {!loadingSlots && slots.length === 0 && (
+            {!loadingSlots && slotsLoadFailed && (
+              <div className="slots-load-error" role="alert">
+                <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+                  <Icon name="wifi-off" size={20} style={{ color: 'var(--orange)', flexShrink: 0 }} aria-hidden />
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontWeight: 800, fontSize: 15, color: 'var(--text)', margin: '0 0 6px', lineHeight: 1.35 }}>
+                      {t('slotsLoadFailedTitle')}
+                    </p>
+                    <p style={{ fontSize: 14, color: 'var(--text-2)', fontWeight: 600, margin: 0, lineHeight: 1.45 }}>
+                      {t('slotsLoadFailedHint')}
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 12, alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        className="calendar-availability-error__btn"
+                        onClick={() => loadSlotsForSelection(true)}
+                      >
+                        {t('retrySlots')}
+                      </button>
+                      <a className="calendar-availability-error__link" href={UML_BOOKING_URL} target="_blank" rel="noopener noreferrer">
+                        {t('openOfficialBooking')}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!loadingSlots && !slotsLoadFailed && slots.length === 0 && (
               <div style={{
                 background: 'var(--surface2)', border: '1px solid var(--border)',
                 borderRadius: 12, padding: '16px 20px',
@@ -721,7 +832,7 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
               </div>
             )}
 
-            {!loadingSlots && slots.length > 0 && (
+            {!loadingSlots && !slotsLoadFailed && slots.length > 0 && (
               <div className="slot-grid">
                 {slots.map((s, i) => (
                   <button key={i}
@@ -758,7 +869,7 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
           </div>
         )}
 
-        {!selectedDate && !loadingCal && (
+        {!selectedDate && !loadingCal && !calendarLoadFailed && (
           <div style={{ textAlign: 'center', padding: '8px 0', fontSize: 15, color: 'var(--text-3)' }}>
             {t('clickHint')}
           </div>
@@ -768,17 +879,19 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
   )
 }
 
-function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, t }) {
+function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, calendarLoadFailed, t }) {
   const gridRef = useRef(null)
   const dayIndices = cells.reduce((acc, date, i) => { if (date) acc.push(i); return acc }, [])
   const focusedIdx = selectedDate
     ? cells.findIndex(d => d && toDateStr(d) === selectedDate)
-    : dayIndices.find(i => {
-        const d = cells[i]
-        const isPast = d < today
-        const isWeekend = d.getDay() === 0 || d.getDay() === 6
-        return !isPast && !isWeekend && (availability[toDateStr(d)] || 0) > 0
-      }) ?? dayIndices[0]
+    : calendarLoadFailed
+      ? dayIndices[0] ?? 0
+      : dayIndices.find(i => {
+          const d = cells[i]
+          const isPast = d < today
+          const isWeekend = d.getDay() === 0 || d.getDay() === 6
+          return !isPast && !isWeekend && (availability[toDateStr(d)] || 0) > 0
+        }) ?? dayIndices[0]
 
   function moveFocus(fromIdx, delta) {
     let target = fromIdx + delta
@@ -804,7 +917,7 @@ function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, 
         const ds = toDateStr(d)
         const isPast = d < today
         const isWeekend = d.getDay() === 0 || d.getDay() === 6
-        if (!isPast && !isWeekend && (availability[ds] || 0) > 0) {
+        if (!calendarLoadFailed && !isPast && !isWeekend && (availability[ds] || 0) > 0) {
           onSelectDate(ds)
         }
       }
@@ -818,16 +931,18 @@ function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, 
         const ds = toDateStr(date)
         const isPast = date < today
         const isWeekend = date.getDay() === 0 || date.getDay() === 6
-        const avail = availability[ds]
+        const avail = availability[ds] ?? 0
         const isSelected = selectedDate === ds
-        const hasSlots = avail > 0
-        const disabled = isPast || isWeekend || avail === 0
+        const hasSlots = !calendarLoadFailed && avail > 0
+        const disabled = calendarLoadFailed || isPast || isWeekend || avail === 0
         const monthName = t('months')[date.getMonth()]
         const dayAriaLabel = isSelected
           ? `${date.getDate()} ${monthName} — ${t('dayAvail', avail)}, ${t('changeService')}`
-          : hasSlots
-          ? `${date.getDate()} ${monthName} — ${t('dayAvail', avail)}`
-          : `${date.getDate()} ${monthName} — ${t('dayNone')}`
+          : calendarLoadFailed && !isPast && !isWeekend
+            ? `${date.getDate()} ${monthName} — ${t('dayLoadFailed')}`
+            : hasSlots
+              ? `${date.getDate()} ${monthName} — ${t('dayAvail', avail)}`
+              : `${date.getDate()} ${monthName} — ${t('dayNone')}`
 
         return (
           <button key={i}
@@ -854,7 +969,7 @@ function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, 
               color: isSelected ? 'white'
                 : hasSlots ? 'var(--accent)'
                 : 'var(--text-3)',
-              opacity: (isPast || isWeekend) ? 0.25 : 1,
+              opacity: (isPast || isWeekend) ? 0.25 : calendarLoadFailed ? 0.42 : 1,
               minWidth: 0,
             }}>
             {date.getDate()}

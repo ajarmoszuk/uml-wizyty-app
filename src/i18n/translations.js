@@ -96,6 +96,15 @@ export const T = {
     noSlots: 'W tym dniu nie ma wolnych miejsc. Wybierz inny dzień.',
     clickHint: 'Kliknij podświetlony dzień, aby zobaczyć godziny przyjęć',
     calendarLegend: 'Podświetlone dni — są wolne terminy',
+    calendarLoadFailedTitle: 'Nie udało się pobrać kalendarza z serwera rezerwacji',
+    calendarLoadFailedHint:
+      'To zwykle chwilowa przerwa techniczna albo problem z siecią — nie oznacza, że nie ma wolnych terminów.',
+    slotsLoadFailedTitle: 'Nie udało się wczytać godzin na ten dzień',
+    slotsLoadFailedHint: 'Spróbuj ponownie. Jeśli nadal nie działa, skorzystaj z oficjalnej strony UMŁ.',
+    retryCalendar: 'Spróbuj ponownie',
+    retrySlots: 'Ponów',
+    openOfficialBooking: 'Otwórz wizyty.uml.lodz.pl',
+    dayLoadFailed: 'Brak danych z serwera — odśwież kalendarz',
     slot1: '1 miejsce',
     slotsN: (n) => `${n} miejsc`,
 
@@ -272,6 +281,15 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     noSlots: 'No available slots on this day. Choose another date.',
     clickHint: 'Click a highlighted day to see appointment times',
     calendarLegend: 'Highlighted days have free slots',
+    calendarLoadFailedTitle: 'Couldn’t load the calendar from the booking server',
+    calendarLoadFailedHint:
+      'This is usually a short technical break or a network issue — it doesn’t mean there are no appointments.',
+    slotsLoadFailedTitle: 'Couldn’t load times for this day',
+    slotsLoadFailedHint: 'Try again. If it keeps failing, use the official Łódź City Office booking site.',
+    retryCalendar: 'Try again',
+    retrySlots: 'Retry',
+    openOfficialBooking: 'Open wizyty.uml.lodz.pl',
+    dayLoadFailed: 'No data from server — refresh the calendar',
     slot1: '1 slot',
     slotsN: (n) => `${n} slots`,
 
@@ -446,6 +464,15 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     noSlots: 'У цей день немає вільних місць. Оберіть інший день.',
     clickHint: 'Натисніть виділений день, щоб побачити години прийому',
     calendarLegend: 'Виділені дні — є вільні терміни',
+    calendarLoadFailedTitle: 'Не вдалося завантажити календар із сервера запису',
+    calendarLoadFailedHint:
+      'Зазвичай це коротка технічна перерва або збій мережі — це не означає, що немає вільних місць.',
+    slotsLoadFailedTitle: 'Не вдалося завантажити години на цей день',
+    slotsLoadFailedHint: 'Спробуйте ще раз. Якщо не вийде — скористайтеся офіційним сайтом UMŁ.',
+    retryCalendar: 'Спробувати знову',
+    retrySlots: 'Повторити',
+    openOfficialBooking: 'Відкрити wizyty.uml.lodz.pl',
+    dayLoadFailed: 'Немає даних із сервера — оновіть календар',
     slot1: '1 місце',
     slotsN: (n) => `${n} місць`,
 

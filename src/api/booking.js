@@ -454,6 +454,15 @@ function cacheSet(key, data, ttl) {
   return data
 }
 
+/** Drop cached slot/range data for one service (e.g. after user taps Retry). */
+export function invalidateServiceSlotCache(branchId, serviceId) {
+  const slotP = `slots:${branchId}:${serviceId}:`
+  const rangeP = `range:${branchId}:${serviceId}:`
+  for (const key of [..._cache.keys()]) {
+    if (key.startsWith(slotP) || key.startsWith(rangeP)) _cache.delete(key)
+  }
+}
+
 // Fetch available slots for a specific date
 // Returns array of { time, slots, maxSlots, reservations }
 export async function fetchSlots(branchId, serviceId, date) {
@@ -469,7 +478,14 @@ export async function fetchSlots(branchId, serviceId, date) {
     notifyConnectionReset(err)
     throw err
   }
-  if (!res.ok) throw new Error(`HTTP ${res.status}`)
+  if (!res.ok) {
+    if (res.status >= 500) {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('uml:connectionreset'))
+      }
+    }
+    throw new Error(`HTTP ${res.status}`)
+  }
   const data = await res.json()
   const times = data?.TIMES || []
   const slots = times.filter(t => t.slots > 0).map(t => ({
@@ -499,16 +515,46 @@ export async function fetchRangeAvailability(branchId, serviceId, startDate, end
     const dateStr = toLocalDateStr(current)
     if (dayOfWeek !== 0 && dayOfWeek !== 6) {
       dates.push(dateStr)
-      promises.push(fetchSlots(branchId, serviceId, dateStr).catch(() => []))
+      promises.push(fetchSlots(branchId, serviceId, dateStr))
     }
     current.setDate(current.getDate() + 1)
   }
 
-  const allSlots = await Promise.all(promises)
-  dates.forEach((d, i) => {
-    results[d] = allSlots[i].reduce((sum, s) => sum + s.slots, 0)
+  if (promises.length === 0) {
+    return cacheSet(rangeKey, results, RANGE_TTL)
+  }
+
+  const settled = await Promise.allSettled(promises)
+  let failCount = 0
+  let lastReason = null
+  settled.forEach((outcome, i) => {
+    const d = dates[i]
+    if (outcome.status === 'fulfilled') {
+      results[d] = outcome.value.reduce((sum, s) => sum + s.slots, 0)
+    } else {
+      failCount++
+      lastReason = outcome.reason
+      results[d] = 0
+      const err = outcome.reason
+      if (isConnectionResetError(err)) notifyConnectionReset(err)
+      else if (err instanceof Error && /^HTTP 5\d\d/.test(err.message)) {
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('uml:connectionreset'))
+        }
+      }
+    }
   })
-  return cacheSet(rangeKey, results, RANGE_TTL)
+
+  // All weekday requests failed — do not cache empty map (would look like “no slots ever”)
+  if (failCount === promises.length) {
+    throw lastReason instanceof Error ? lastReason : new Error('Calendar unavailable')
+  }
+
+  // Only cache a full successful range; partial failures return live data without caching
+  if (failCount === 0) {
+    return cacheSet(rangeKey, results, RANGE_TTL)
+  }
+  return results
 }
 
 // Send SMS verification code

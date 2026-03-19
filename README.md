@@ -44,6 +44,10 @@ npm run build
 
 The dev server proxies `/api/*` → `https://wizyty.uml.lodz.pl/*`, so the app works out of the box locally without touching CORS headers.
 
+### Vite terminal: `http proxy error` + `read ECONNRESET`
+
+That means the TLS connection to `wizyty.uml.lodz.pl` was reset (remote side closed it). For this API that **usually** matches **scheduled maintenance** (often overnight). It can also be a transient network issue. The in-app banner about connection reset / maintenance is wired to the same situation when `fetch` fails in the browser.
+
 ## Production deployment
 
 In production you need a reverse proxy that forwards requests from your domain to `wizyty.uml.lodz.pl`. Example nginx snippet:
