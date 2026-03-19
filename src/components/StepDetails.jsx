@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useT, useDobHint } from '../i18n.jsx'
+import { useT, useLang, useDobHint, useServiceLabel } from '../i18n.jsx'
 
 const STORAGE_KEY = 'uml_user_data'
 function loadSaved() {
@@ -28,7 +28,8 @@ function displayPhone(digits) {
 export default function StepDetails({ booking, onNext, onBack }) {
   const t = useT()
   const dobHint = useDobHint()
-  const lang = t('lang')
+  const svcLabel = useServiceLabel()
+  const { lang } = useLang()
   const saved = loadSaved()
   const [form, setForm] = useState({
     name: saved.name || '',
@@ -80,8 +81,8 @@ export default function StepDetails({ booking, onNext, onBack }) {
           <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--text)' }}>
             {formatDateLong(booking.date, lang)}, <span style={{ color: 'var(--accent)' }}>{booking.slot.time}</span>
           </div>
-          {booking.service?.label && (
-            <div style={{ fontSize: 13, color: 'var(--text-2)', marginTop: 3, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{booking.service.label}</div>
+          {booking.service && (
+            <div style={{ fontSize: 13, color: 'var(--text-2)', marginTop: 3, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{svcLabel(booking.service)}</div>
           )}
         </div>
       </div>

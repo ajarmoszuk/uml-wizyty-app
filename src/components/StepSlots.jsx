@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { fetchRangeAvailability, fetchSlots, SERVICES, CATEGORY_META } from '../api/booking.js'
-import { useT, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../i18n.jsx'
+import { useT, useLang, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../i18n.jsx'
 
 function toDateStr(d) {
   const y = d.getFullYear()
@@ -9,9 +9,10 @@ function toDateStr(d) {
   return `${y}-${m}-${day}`
 }
 
-function formatDateLong(dateStr) {
+function formatDateLong(dateStr, lang) {
   const d = new Date(dateStr + 'T12:00:00')
-  return d.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })
+  const locale = lang === 'uk' ? 'uk-UA' : lang === 'en' ? 'en-GB' : 'pl-PL'
+  return d.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
 const CATEGORIES = [...new Set(SERVICES.map(s => s.category))]
@@ -122,6 +123,7 @@ function BookingRules() {
 // ── Main component ───────────────────────────────────────────────────────────
 export default function StepSlots({ onSelect }) {
   const t = useT()
+  const { lang } = useLang()
   const pluralService = usePluralService()
   const svcLabel = useServiceLabel()
   const officeLabel = useOfficeLabel()
@@ -667,7 +669,7 @@ export default function StepSlots({ onSelect }) {
         {selectedDate && (
           <div className="fade-up" style={{ borderTop: '1px solid var(--border)', paddingTop: 24 }}>
             <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', marginBottom: 16, letterSpacing: '-0.01em' }}>
-              {t('availableHours')} {t('on')} <span style={{ color: 'var(--accent)', textTransform: 'lowercase' }}>{formatDateLong(selectedDate)}</span>
+              {t('availableHours')} {t('on')} <span style={{ color: 'var(--accent)', textTransform: 'lowercase' }}>{formatDateLong(selectedDate, lang)}</span>
             </h2>
 
             {loadingSlots && (
