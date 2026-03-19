@@ -336,6 +336,24 @@ export const CATEGORY_META = {
   'Działalność gospodarcza':        { icon: '💼', color: '#1e40af' },
 }
 
+// Detect probable server-side maintenance from a fetch TypeError.
+// If the browser is online but fetch fails with TypeError it almost certainly
+// means the remote API reset the connection (Firefox: PR_CONNECT_RESET_ERROR,
+// Chrome: ERR_CONNECTION_RESET) — i.e. the backend is in maintenance.
+export function isConnectionResetError(err) {
+  if (!(err instanceof TypeError)) return false
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return false
+  return true
+}
+
+function notifyConnectionReset(err) {
+  if (isConnectionResetError(err)) {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('uml:connectionreset'))
+    }
+  }
+}
+
 function toLocalDateStr(date) {
   const y = date.getFullYear()
   const m = String(date.getMonth() + 1).padStart(2, '0')
@@ -370,7 +388,13 @@ export async function fetchSlots(branchId, serviceId, date) {
   const hit = cacheGet(key)
   if (hit) return hit
 
-  const res = await fetch(`/api/admin/API/time/${branchId}/${serviceId}/${dateStr}`)
+  let res
+  try {
+    res = await fetch(`/api/admin/API/time/${branchId}/${serviceId}/${dateStr}`)
+  } catch (err) {
+    notifyConnectionReset(err)
+    throw err
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   const data = await res.json()
   const times = data?.TIMES || []
@@ -425,7 +449,13 @@ export async function sendVerificationCode({ phone, branchId, serviceId, sedcoBr
   })
   const form = new FormData()
   form.append('JSONForm', payload)
-  const res = await fetch('/api/admin/API/validate_phone', { method: 'POST', body: form })
+  let res
+  try {
+    res = await fetch('/api/admin/API/validate_phone', { method: 'POST', body: form })
+  } catch (err) {
+    notifyConnectionReset(err)
+    throw err
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   return await res.json()
 }
@@ -461,7 +491,13 @@ export async function takeAppointment({
   })
   const form = new FormData()
   form.append('JSONForm', payload)
-  const res = await fetch('/api/admin/API/take_appointment', { method: 'POST', body: form })
+  let res
+  try {
+    res = await fetch('/api/admin/API/take_appointment', { method: 'POST', body: form })
+  } catch (err) {
+    notifyConnectionReset(err)
+    throw err
+  }
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
   const data = await res.json()
   const result = data?.RESPONSE?.TakeAppointmentResult

@@ -66,6 +66,59 @@ function ViewToggle({ viewMode, onChange }) {
   )
 }
 
+// ── Booking rules panel ──────────────────────────────────────────────────────
+function BookingRules() {
+  const t = useT()
+  const [open, setOpen] = useState(false)
+  const rules = [t('rule1'), t('rule2'), t('rule3'), t('rule4'), t('rule5')]
+  return (
+    <div style={{ marginTop: 28, border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          gap: 10, padding: '13px 16px',
+          background: 'var(--surface2)', border: 'none', cursor: 'pointer',
+          fontFamily: 'var(--font)', fontSize: 13, fontWeight: 700,
+          color: 'var(--text-2)', textAlign: 'left',
+        }}
+      >
+        <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span aria-hidden="true">📋</span> {t('rulesToggle')}
+        </span>
+        <span style={{ fontSize: 11, color: 'var(--text-3)', transition: 'transform 0.2s', display: 'inline-block', transform: open ? 'rotate(180deg)' : 'none' }} aria-hidden="true">▼</span>
+      </button>
+      {open && (
+        <div style={{ padding: '16px 18px 18px', background: 'var(--surface)' }}>
+          <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 800, color: 'var(--text)' }}>{t('rulesTitle')}</p>
+          <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {rules.map((rule, i) => (
+              <li key={i} style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.65 }}>{rule}</li>
+            ))}
+          </ol>
+          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 7, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+            <a
+              href="https://bip.uml.lodz.pl/inne-informacje/ochrona-danych-osobowych/"
+              target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: 5 }}
+            >
+              <span aria-hidden="true">🔒</span> {t('rule6')}
+            </a>
+            <a
+              href="https://bip.uml.lodz.pl/inne-informacje/polityka-prywatnosci/"
+              target="_blank" rel="noopener noreferrer"
+              style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: 5 }}
+            >
+              <span aria-hidden="true">📄</span> {t('rule7')}
+            </a>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Main component ───────────────────────────────────────────────────────────
 export default function StepSlots({ onSelect }) {
   const t = useT()
@@ -244,7 +297,8 @@ export default function StepSlots({ onSelect }) {
         </p>
 
         {!selectedCategory ? (
-          isGrid ? (
+          <>
+          {isGrid ? (
             // ── CATEGORY GRID ─────────────────────────────────────────────
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
               {CATEGORIES.map(cat => {
@@ -345,7 +399,9 @@ export default function StepSlots({ onSelect }) {
                 )
               })}
             </div>
-          )
+          )}
+          <BookingRules />
+          </>
         ) : (
           <>
             {/* Back to categories */}

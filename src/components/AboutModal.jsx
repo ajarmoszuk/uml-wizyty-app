@@ -110,13 +110,25 @@ export default function AboutModal({ onClose }) {
           </span>
         </div>
 
-        {/* Data note */}
+        {/* Data / proxy note */}
         <div style={{
           background: 'var(--accent-light)', border: '1px solid var(--accent)',
-          borderRadius: 10, padding: '12px 16px', marginBottom: 24,
-          fontSize: 13, color: 'var(--accent)', fontWeight: 600,
+          borderRadius: 10, padding: '14px 16px', marginBottom: 24,
         }}>
-          {t('aboutDataNote')}
+          <div style={{ fontSize: 13, color: 'var(--accent)', fontWeight: 700, lineHeight: 1.6 }}>
+            {t('aboutDataNote')}
+          </div>
+          <div style={{
+            marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--accent)',
+            display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
+          }}>
+            <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'monospace' }}>
+              Browser → Vercel proxy → wizyty.uml.lodz.pl
+            </span>
+            <span style={{ fontSize: 11, background: 'var(--accent)', color: '#fff', borderRadius: 5, padding: '1px 7px', fontWeight: 800 }}>
+              zero storage
+            </span>
+          </div>
         </div>
 
         {/* License */}

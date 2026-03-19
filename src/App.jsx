@@ -11,26 +11,34 @@ function useSystemBanners() {
   const [isOffline, setIsOffline] = useState(!navigator.onLine)
   const [offlineDismissed, setOfflineDismissed] = useState(false)
   const [maintenanceDismissed, setMaintenanceDismissed] = useState(false)
+  const [connectionReset, setConnectionReset] = useState(false)
+  const [connectionResetDismissed, setConnectionResetDismissed] = useState(false)
 
   useEffect(() => {
     const goOffline = () => { setIsOffline(true); setOfflineDismissed(false) }
     const goOnline  = () => setIsOffline(false)
+    // PR_CONNECT_RESET_ERROR / ERR_CONNECTION_RESET → server maintenance
+    const onReset = () => { setConnectionReset(true); setConnectionResetDismissed(false) }
     window.addEventListener('offline', goOffline)
     window.addEventListener('online',  goOnline)
+    window.addEventListener('uml:connectionreset', onReset)
     return () => {
       window.removeEventListener('offline', goOffline)
       window.removeEventListener('online',  goOnline)
+      window.removeEventListener('uml:connectionreset', onReset)
     }
   }, [])
 
-  const hour = new Date().getHours() // local time
-  const isMaintenance = hour >= 0 && hour < 3
+  const hour = new Date().getHours()
+  const isTimeWindow = hour >= 0 && hour < 3
+  const isMaintenance = isTimeWindow || connectionReset
 
   return {
-    showOffline:      isOffline && !offlineDismissed,
-    showMaintenance:  !isOffline && isMaintenance && !maintenanceDismissed,
-    dismissOffline:      () => setOfflineDismissed(true),
-    dismissMaintenance:  () => setMaintenanceDismissed(true),
+    showOffline:           isOffline && !offlineDismissed,
+    showMaintenance:       !isOffline && isMaintenance && !maintenanceDismissed,
+    isConnectionReset:     connectionReset && !isTimeWindow, // flag to show specific message
+    dismissOffline:        () => setOfflineDismissed(true),
+    dismissMaintenance:    () => { setMaintenanceDismissed(true); setConnectionResetDismissed(true) },
   }
 }
 
@@ -74,7 +82,7 @@ export default function App() {
         )}
         {banners.showMaintenance && (
           <SystemBanner icon="🔧" color="var(--orange)" bg="var(--orange-light)" onDismiss={banners.dismissMaintenance}>
-            {t('bannerMaintenance')}
+            {banners.isConnectionReset ? t('bannerConnectionReset') : t('bannerMaintenance')}
           </SystemBanner>
         )}
 
@@ -156,6 +164,9 @@ export default function App() {
 
         <div style={{ textAlign: 'center', marginTop: 20, fontSize: 12, color: 'var(--text-3)', lineHeight: 1.8 }}>
           <div>{t('unofficial')}</div>
+          <div style={{ fontSize: 11, color: 'var(--text-3)', opacity: 0.75, fontFamily: 'monospace', marginTop: 2 }}>
+            🔒 {t('proxyNote')}
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
             <span>© 2026 Aleksander Jarmoszuk</span>
             <span style={{ opacity: 0.4 }}>·</span>
