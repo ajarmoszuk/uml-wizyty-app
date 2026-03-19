@@ -81,6 +81,505 @@ body {
   min-width: 0;
 }
 
+/* Top bar: desktop = one row; narrow = grid so theme/GitHub aren’t orphaned when labels wrap */
+.top-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  min-width: 0;
+}
+.top-bar__cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.top-bar__lang {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  min-width: min-content;
+}
+/* Segmented language control — each cell fixed min width so flags don’t overlap PL/EN/UK */
+.top-bar__lang-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  min-width: 52px;
+  padding: 0 10px;
+  flex: 0 0 auto;
+  border: none;
+  border-left: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  font-family: var(--font);
+  color: var(--text-3);
+  background: transparent;
+  transition: background var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+.top-bar__lang-btn:first-child {
+  border-left: none;
+}
+.top-bar__lang-btn[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+.top-bar__lang-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  z-index: 1;
+}
+.top-bar__lang-flag {
+  flex: 0 0 1.35em;
+  width: 1.35em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 14px;
+}
+.top-bar__lang-code {
+  flex: 0 0 auto;
+  line-height: 1;
+  letter-spacing: 0.03em;
+}
+.top-bar__tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.top-bar__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font);
+  transition: border-color var(--transition), color var(--transition);
+  flex-shrink: 0;
+  position: relative;
+}
+.top-bar__action:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.top-bar__action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+/* Service picker: grid vs list (min ~44px touch target, i18n labels in JSX) */
+.view-toggle {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.view-toggle__btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--text-3);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+.view-toggle__btn[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+.view-toggle__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+@media (max-width: 640px) {
+  .top-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: 8px;
+    row-gap: 10px;
+    justify-content: stretch;
+  }
+  .top-bar__cluster {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .top-bar__lang {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+    min-width: min-content;
+  }
+  .top-bar__tools {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: flex-end;
+  }
+  .top-bar__action-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+  .top-bar__action {
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+  }
+  .top-bar__lang-btn {
+    min-width: 48px;
+    padding: 0 8px;
+    font-size: 12px;
+    gap: 5px;
+  }
+  .top-bar__lang-flag {
+    font-size: 13px;
+  }
+}
+@media (max-width: 360px) {
+  .top-bar__lang-btn {
+    position: relative;
+    min-width: 42px;
+    padding: 0 8px;
+    gap: 0;
+  }
+  .top-bar__lang-code {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* Booking rules panel — scannable rows (Step 1) */
+.booking-rules__panel {
+  padding: 14px 16px 18px;
+  background: var(--surface);
+}
+.booking-rules__lead {
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.booking-rules__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.booking-rules__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  min-width: 0;
+}
+.booking-rules__icon-wrap {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--rule-accent, var(--accent)) 18%, transparent);
+}
+.booking-rules__text {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-2);
+  line-height: 1.55;
+  min-width: 0;
+}
+.booking-rules__links {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+@media (min-width: 420px) {
+  .booking-rules__links {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+.booking-rules__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--accent-light);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font);
+  color: var(--accent);
+  text-decoration: none;
+  transition: border-color var(--transition), background var(--transition);
+  min-height: 44px;
+  box-sizing: border-box;
+}
+.booking-rules__link:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, var(--accent-light));
+}
+.booking-rules__link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+/* Lucide <svg> inside <a> can steal hits in WebKit — clicks must reach the anchor */
+.booking-rules__link svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Office picker: map + UML links under each branch */
+.office-card__links {
+  position: relative;
+  z-index: 2;
+}
+.office-card__links a {
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  padding: 10px 8px;
+  margin: -4px 0;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.office-card__links a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.office-card__links a svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Google Maps link (calendar chip, details, verify, confirm, office guide) */
+.maps-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 8px 6px;
+  margin: -2px -6px;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.maps-inline-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.maps-inline-link svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Office guide: service row = real button (was plain text — looked clickable) */
+.office-guide__svc-btn {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  padding: 10px 10px;
+  margin: 0 -10px;
+  text-align: left;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  transition: background var(--transition);
+  box-sizing: border-box;
+}
+.office-guide__svc-btn:hover {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.office-guide__svc-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.office-guide__svc-btn svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+/* Office guide: Maps — full-width CTA, 44px+ touch target, clear copy (i18n) */
+.office-guide__maps-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 56px;
+  padding: 14px 16px;
+  margin: 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface2));
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+.office-guide__maps-btn:hover {
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface2));
+}
+.office-guide__maps-btn:active {
+  background: color-mix(in srgb, var(--accent) 22%, var(--surface2));
+}
+.office-guide__maps-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  position: relative;
+  z-index: 1;
+}
+.office-guide__maps-btn-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+.office-guide__maps-btn-textcol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.office-guide__maps-btn-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+.office-guide__maps-btn-sub {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-2);
+  line-height: 1.35;
+  word-break: break-word;
+}
+.office-guide__maps-btn-caption {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-3);
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+}
+.office-guide__maps-btn-end {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.office-guide__maps-btn-tabpill {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  border: 1px solid color-mix(in srgb, var(--border) 75%, var(--accent));
+  padding: 5px 10px;
+  border-radius: 999px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.office-guide__maps-btn svg {
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+@media (max-width: 420px) {
+  .office-guide__maps-btn {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding-bottom: 16px;
+  }
+  .office-guide__maps-btn-end {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
 /* Step cards & modals: fluid horizontal padding */
 .card-padding {
   padding: clamp(16px, 5vw, 32px) clamp(12px, 4vw, 28px);
@@ -97,6 +596,156 @@ body {
   .grid-safe {
     grid-template-columns: 1fr;
   }
+}
+
+/* Category / service cards: CSS-only hover (avoids stuck borders when toggling grid ↔ list) */
+.uml-picker-btn {
+  font-family: var(--font);
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+.uml-picker-btn:focus {
+  outline: none;
+}
+.uml-picker-btn:focus-visible {
+  outline: 2px solid var(--card-accent, var(--accent));
+  outline-offset: 3px;
+}
+.uml-picker-btn--cat-grid {
+  padding: 16px 10px 14px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-top: 4px solid var(--card-accent);
+  border-radius: 14px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 110px;
+  min-width: 0;
+}
+.uml-picker-btn--cat-grid:hover {
+  background: color-mix(in srgb, var(--card-accent) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--card-accent) 45%, var(--border));
+  border-top-color: var(--card-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--card-accent) 14%, transparent);
+}
+.uml-picker-btn--cat-list {
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--card-accent);
+  border-radius: 14px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 68px;
+}
+.uml-picker-btn--cat-list:hover {
+  background: color-mix(in srgb, var(--card-accent) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--card-accent) 50%, var(--border));
+  border-left-color: var(--card-accent);
+}
+.uml-picker-btn--svc-grid {
+  padding: 18px 14px 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-top: 3px solid var(--card-accent);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.4;
+  min-height: 110px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.uml-picker-btn--svc-grid:hover {
+  background: color-mix(in srgb, var(--card-accent) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--card-accent) 45%, var(--border));
+  border-top-color: var(--card-accent);
+  transform: translateY(-1px);
+}
+.uml-picker-btn--svc-list {
+  padding: 15px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-left: 4px solid color-mix(in srgb, var(--card-accent) 40%, transparent);
+  border-radius: 12px;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  line-height: 1.4;
+}
+.uml-picker-btn--svc-list:hover {
+  background: color-mix(in srgb, var(--card-accent) 8%, var(--surface));
+  border-color: color-mix(in srgb, var(--card-accent) 50%, var(--border));
+  border-left-color: var(--card-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .uml-picker-btn--cat-grid:hover,
+  .uml-picker-btn--svc-grid:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+/* Office branch card: hover on wrapper (no JS border mutation) */
+.uml-office-card {
+  border: 1.5px solid var(--border);
+  border-left: 4px solid var(--card-accent);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface);
+  transition: border-color 0.15s ease, border-left-color 0.15s ease;
+}
+.uml-office-card:hover {
+  border-color: color-mix(in srgb, var(--card-accent) 50%, var(--border));
+  border-left-color: var(--card-accent);
+}
+.uml-office-card__btn {
+  width: 100%;
+  padding: 18px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: background 0.15s ease;
+  box-sizing: border-box;
+}
+.uml-office-card:hover .uml-office-card__btn {
+  background: color-mix(in srgb, var(--card-accent) 8%, transparent);
+}
+.uml-office-card__btn:focus {
+  outline: none;
+}
+.uml-office-card__btn:focus-visible {
+  outline: 2px solid var(--card-accent, var(--accent));
+  outline-offset: -2px;
 }
 
 /* Calendar: keep 7 columns but allow shrinking */
@@ -197,45 +846,79 @@ body {
   font-size: clamp(22px, 7vw, 30px) !important;
 }
 
-/* Stepper: allow labels to wrap on small screens */
-.stepper-track {
+/* Stepper: 3 equal columns; rail ::before runs 1/6 → 5/6 (through dot centres); labels under dots */
+.stepper {
+  position: relative;
+  width: 100%;
+  --stepper-dot: 36px;
+}
+.stepper-visual {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  list-style: none;
-  padding: 0;
-  flex-wrap: nowrap;
-  max-width: 100%;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: stretch;
+  width: 100%;
+  box-sizing: border-box;
 }
-.stepper-track > li {
-  list-style: none;
+/* Single line behind row, aligned with vertical centre of dots */
+.stepper-visual::before {
+  content: '';
+  position: absolute;
+  left: calc(100% / 6);
+  right: calc(100% / 6);
+  top: calc(var(--stepper-dot) / 2 - 1.5px);
+  height: 3px;
+  border-radius: 2px;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--green) 0,
+    var(--green) var(--stepper-rail-pct, 0%),
+    var(--border) var(--stepper-rail-pct, 0%),
+    var(--border) 100%
+  );
+  transition: background 0.35s ease;
 }
-.stepper-item {
+.stepper-col {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  max-width: 33%;
+  gap: 8px;
+  flex: 1 1 0;
   min-width: 0;
 }
-.stepper-label {
+/* Don’t dim the whole column — opacity made dots translucent so the rail showed through */
+.stepper-col--future .stepper-dot {
+  /* Opaque disc masks the ::before rail (surface2 is solid; avoids any bleed-through) */
+  background: var(--surface2);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+.stepper-dot {
+  width: var(--stepper-dot);
+  height: var(--stepper-dot);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+.stepper-label-cell {
   font-size: clamp(10px, 2.6vw, 12px);
-  font-weight: 600;
-  text-align: center;
   line-height: 1.25;
+  text-align: center;
   word-break: break-word;
   hyphens: auto;
+  width: 100%;
+  max-width: 100%;
   padding: 0 2px;
-}
-.stepper-connector {
-  width: clamp(16px, 7vw, 56px);
-  height: 3px;
-  margin: 0 2px 22px;
-  border-radius: 2px;
-  flex-shrink: 0;
-  list-style: none;
-  align-self: center;
+  box-sizing: border-box;
 }
 
 .app-title {

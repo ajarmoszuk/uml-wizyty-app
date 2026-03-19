@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useLang, useTheme, useT } from '../../i18n'
 import AboutModal from './AboutModal.jsx'
+import OfficeGuideModal from './OfficeGuideModal.jsx'
 import Icon from '../ui/Icon.jsx'
 
 const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
@@ -10,6 +11,8 @@ const LANGS = [
   { code: 'en', flag: '🇬🇧', label: 'English', short: 'EN' },
   { code: 'uk', flag: '🇺🇦', label: 'Ukrainian', short: 'UK' },
 ]
+
+const COMPACT_TOPBAR_MQ = '(max-width: 640px)'
 
 function GitHubIcon() {
   return (
@@ -44,6 +47,18 @@ export default function TopBar() {
   const { dark, setDark } = useTheme()
   const t = useT()
   const [showAbout, setShowAbout] = useState(false)
+  const [showOfficeGuide, setShowOfficeGuide] = useState(false)
+  const [compactTopBar, setCompactTopBar] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia(COMPACT_TOPBAR_MQ).matches,
+  )
+
+  useEffect(() => {
+    const mq = window.matchMedia(COMPACT_TOPBAR_MQ)
+    const sync = () => setCompactTopBar(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   useEffect(() => {
     const open = () => setShowAbout(true)
@@ -51,89 +66,110 @@ export default function TopBar() {
     return () => window.removeEventListener('uml:openabout', open)
   }, [])
 
+  useEffect(() => {
+    const open = () => setShowOfficeGuide(true)
+    window.addEventListener('uml:openofficeguide', open)
+    return () => window.removeEventListener('uml:openofficeguide', open)
+  }, [])
+
   const iconBtn = {
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: 40, height: 40, borderRadius: 8,
-    background: 'var(--surface2)', border: '1px solid var(--border)',
-    cursor: 'pointer', color: 'var(--text-2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    background: 'var(--surface2)',
+    border: '1px solid var(--border)',
+    cursor: 'pointer',
+    color: 'var(--text-2)',
     transition: 'all var(--transition)',
     flexShrink: 0,
   }
 
   return (
     <>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
-        gap: 8, marginBottom: 20, flexWrap: 'wrap',
-        width: '100%', minWidth: 0,
-      }}>
+      <div className="top-bar">
+        <div className="top-bar__cluster">
+          <button
+            type="button"
+            className="top-bar__action"
+            onClick={() => setShowOfficeGuide(true)}
+            aria-haspopup="dialog"
+            aria-label={compactTopBar ? t('officesGuideTitle') : undefined}
+            title={compactTopBar ? t('officesGuide') : undefined}
+          >
+            <Icon name="map-pinned" size={15} aria-hidden />
+            <span className="top-bar__action-label" aria-hidden={compactTopBar}>{t('officesGuide')}</span>
+          </button>
+          <button
+            type="button"
+            className="top-bar__action"
+            onClick={() => setShowAbout(true)}
+            aria-haspopup="dialog"
+            aria-label={compactTopBar ? t('aboutTitle') : undefined}
+            title={compactTopBar ? t('about') : undefined}
+          >
+            <Icon name="info" size={15} aria-hidden />
+            <span className="top-bar__action-label" aria-hidden={compactTopBar}>{t('about')}</span>
+          </button>
+        </div>
 
-        {/* About */}
-        <button
-          onClick={() => setShowAbout(true)}
-          aria-haspopup="dialog"
-          style={{
-            ...iconBtn, width: 'auto', padding: '0 14px', gap: 6, fontSize: 14, fontWeight: 700, fontFamily: 'var(--font)',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}>
-          <Icon name="info" size={15} />
-          {t('about')}
-        </button>
-
-        {/* Language switcher */}
-        <div
-          role="group"
-          aria-label="Language"
-          style={{
-            display: 'flex', background: 'var(--surface2)', border: '1px solid var(--border)',
-            borderRadius: 8, overflow: 'hidden',
-          }}>
-          {LANGS.map(l => (
+        <div className="top-bar__lang" role="group" aria-label="Language">
+          {LANGS.map((l) => (
             <button
               key={l.code}
+              type="button"
+              className="top-bar__lang-btn"
               onClick={() => setLang(l.code)}
               aria-label={l.label}
               aria-pressed={lang === l.code}
-              style={{
-                padding: '0 11px', height: 40,
-                background: lang === l.code ? 'var(--accent)' : 'transparent',
-                border: 'none', cursor: 'pointer',
-                fontSize: 13, fontWeight: 800, fontFamily: 'var(--font)',
-                color: lang === l.code ? 'white' : 'var(--text-3)',
-                transition: 'all var(--transition)',
-                display: 'flex', alignItems: 'center', gap: 4,
-              }}>
-              <span style={{ fontSize: 15 }} aria-hidden="true">{l.flag}</span>
-              <span aria-hidden="true">{l.short}</span>
+            >
+              <span className="top-bar__lang-flag" aria-hidden="true">{l.flag}</span>
+              <span className="top-bar__lang-code" aria-hidden="true">{l.short}</span>
             </button>
           ))}
         </div>
 
-        {/* Dark mode toggle */}
-        <button
-          onClick={() => setDark(!dark)}
-          aria-label={dark ? t('darkOn') : t('darkOff')}
-          aria-pressed={dark}
-          style={iconBtn}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}>
-          {dark ? <SunIcon /> : <MoonIcon />}
-        </button>
-
-        {/* GitHub */}
-        <a
-          href={GITHUB_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label={t('githubLabel')}
-          style={{ ...iconBtn, textDecoration: 'none' }}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-2)' }}>
-          <GitHubIcon />
-        </a>
+        <div className="top-bar__tools">
+          <button
+            type="button"
+            onClick={() => setDark(!dark)}
+            aria-label={dark ? t('darkOn') : t('darkOff')}
+            aria-pressed={dark}
+            style={iconBtn}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent)'
+              e.currentTarget.style.color = 'var(--accent)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.color = 'var(--text-2)'
+            }}
+          >
+            {dark ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <a
+            href={GITHUB_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t('githubLabel')}
+            style={{ ...iconBtn, textDecoration: 'none' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--accent)'
+              e.currentTarget.style.color = 'var(--accent)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--border)'
+              e.currentTarget.style.color = 'var(--text-2)'
+            }}
+          >
+            <GitHubIcon />
+          </a>
+        </div>
       </div>
 
+      {showOfficeGuide && <OfficeGuideModal onClose={() => setShowOfficeGuide(false)} />}
       {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
     </>
   )

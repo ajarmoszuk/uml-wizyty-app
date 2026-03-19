@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { sendVerificationCode, takeAppointment } from '../../api/booking.js'
 import { BackBtn, primaryBtn } from './StepDetails.jsx'
-import { useT } from '../../i18n'
+import { useT, useOfficeLabel } from '../../i18n'
+import { googleMapsUrl } from '../../utils/googleMaps.js'
 import Icon from '../ui/Icon.jsx'
 
 export default function StepVerify({ booking, details, onSuccess, onBack }) {
   const t = useT()
+  const officeLabel = useOfficeLabel()
   const [phase, setPhase] = useState('send') // send | code | booking
   const [code, setCode] = useState(['', '', '', ''])
   const [error, setError] = useState(null)
@@ -87,6 +89,41 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
 
   return (
     <div className="fade-up card-padding" style={{ maxWidth: 480, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
+
+      {booking.service?.address && (
+        <div
+          style={{
+            background: 'var(--surface2)',
+            border: '1px solid var(--border)',
+            borderRadius: 12,
+            padding: '12px 14px',
+            marginBottom: 20,
+            fontSize: 13,
+            color: 'var(--text-2)',
+            lineHeight: 1.45,
+          }}
+        >
+          <div style={{ fontSize: 11, fontWeight: 800, color: 'var(--text-3)', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 6 }}>
+            {t('addressLabel')}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 12px', justifyContent: 'space-between' }}>
+            <span style={{ fontWeight: 700, color: 'var(--text)', wordBreak: 'break-word' }}>
+              {booking.service.officeLabel && `${officeLabel(booking.service)} · `}
+              {booking.service.address}
+            </span>
+            <a
+              className="maps-inline-link"
+              href={googleMapsUrl(booking.service.address)}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${t('officeLinkMaps')}: ${booking.service.address}`}
+            >
+              <Icon name="map-pinned" size={14} />
+              {t('officeLinkMaps')}
+            </a>
+          </div>
+        </div>
+      )}
 
       {phase === 'send' && (
         <>

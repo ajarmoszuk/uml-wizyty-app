@@ -18,6 +18,7 @@ This wrapper talks to the same servers and does the same thing — just without 
 - **Grid & list views** — toggle between a visual card grid and a compact list
 - **Dark mode** — follows your system preference, toggleable manually
 - **Three languages** — Polish 🇵🇱, English 🇬🇧, Ukrainian 🇺🇦
+- **Office guide** — collapsible “where / what” overview (from the same service data as booking), with search — not a wall of text
 - **Accessible** — ARIA labels, keyboard navigation, focus management, `prefers-reduced-motion` support
 - **No data collected** — your personal details go directly to `wizyty.uml.lodz.pl` and nowhere else
 
@@ -59,9 +60,10 @@ location /api/ {
 ```
 src/
 ├── api/
-│   └── booking.js              # API calls + SERVICES + CATEGORY_META
+│   ├── booking.js              # API calls + SERVICES + CATEGORY_META
+│   └── officeDirectory.js      # Group SERVICES by address (one card per building) for the office guide
 ├── components/
-│   ├── layout/                 # Shell: TopBar, AboutModal, LodzCOA, SystemBanner
+│   ├── layout/                 # TopBar, AboutModal, OfficeGuideModal, LodzCOA, SystemBanner
 │   ├── steps/                  # Booking flow: StepSlots → Details → Verify → Confirm
 │   └── ui/                     # Shared Icon (Lucide map)
 ├── hooks/

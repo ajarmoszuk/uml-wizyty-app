@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { fetchRangeAvailability, fetchSlots, SERVICES, CATEGORY_META, serviceDisplayIcon } from '../../api/booking.js'
 import { useT, useLang, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../../i18n'
+import { googleMapsUrl } from '../../utils/googleMaps.js'
 import Icon from '../ui/Icon.jsx'
 
 function toDateStr(d) {
@@ -9,6 +10,8 @@ function toDateStr(d) {
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
 }
+
+const UML_BOOKING_URL = 'https://wizyty.uml.lodz.pl/'
 
 function formatDateLong(dateStr, lang) {
   const d = new Date(dateStr + 'T12:00:00')
@@ -45,23 +48,27 @@ function ListIcon() {
 
 // ── View toggle ──────────────────────────────────────────────────────────────
 function ViewToggle({ viewMode, onChange }) {
-  const btnBase = (active) => ({
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: 32, height: 32, borderRadius: 6, border: 'none',
-    background: active ? 'var(--accent)' : 'transparent',
-    color: active ? 'white' : 'var(--text-3)',
-    cursor: 'pointer', transition: 'all var(--transition)',
-    flexShrink: 0,
-  })
+  const t = useT()
   return (
-    <div role="group" aria-label="View mode" style={{
-      display: 'flex', background: 'var(--surface2)', border: '1px solid var(--border)',
-      borderRadius: 8, padding: 2, gap: 2, flexShrink: 0,
-    }}>
-      <button onClick={() => onChange('grid')} aria-pressed={viewMode === 'grid'} aria-label="Grid view" title="Grid view" style={btnBase(viewMode === 'grid')}>
+    <div role="group" aria-label={t('viewModeGroup')} className="view-toggle">
+      <button
+        type="button"
+        className="view-toggle__btn"
+        onClick={() => onChange('grid')}
+        aria-pressed={viewMode === 'grid'}
+        aria-label={t('viewModeGrid')}
+        title={t('viewModeGrid')}
+      >
         <GridIcon />
       </button>
-      <button onClick={() => onChange('list')} aria-pressed={viewMode === 'list'} aria-label="List view" title="List view" style={btnBase(viewMode === 'list')}>
+      <button
+        type="button"
+        className="view-toggle__btn"
+        onClick={() => onChange('list')}
+        aria-pressed={viewMode === 'list'}
+        aria-label={t('viewModeList')}
+        title={t('viewModeList')}
+      >
         <ListIcon />
       </button>
     </div>
@@ -69,50 +76,123 @@ function ViewToggle({ viewMode, onChange }) {
 }
 
 // ── Booking rules panel ──────────────────────────────────────────────────────
+const BOOKING_RULE_ROWS = [
+  { ruleKey: 'rule1', icon: 'file-stack', color: '#2563eb' },
+  { ruleKey: 'rule2', icon: 'calendar-clock', color: '#7c3aed' },
+  { ruleKey: 'rule3', icon: 'ban', color: '#0d9488' },
+  { ruleKey: 'rule4', icon: 'clock', color: '#ea580c' },
+  { ruleKey: 'rule5', icon: 'phone', color: '#16a34a' },
+]
+
+const RULE_PHONE_SPLIT = /(\+48\s*\(42\)\s*638-44-44)/
+
+/** Makes the UMŁ cancellation number tappable on phones */
+function RuleRichText({ text }) {
+  if (!RULE_PHONE_SPLIT.test(text)) return text
+  const parts = text.split(RULE_PHONE_SPLIT)
+  return (
+    <>
+      {parts.map((part, i) =>
+        RULE_PHONE_SPLIT.test(part) ? (
+          <a
+            key={i}
+            href="tel:+48426384444"
+            style={{
+              color: 'var(--accent)',
+              fontWeight: 800,
+              textDecoration: 'underline',
+              textUnderlineOffset: 2,
+            }}
+          >
+            {part}
+          </a>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  )
+}
+
 function BookingRules() {
   const t = useT()
-  const [open, setOpen] = useState(false)
-  const rules = [t('rule1'), t('rule2'), t('rule3'), t('rule4'), t('rule5')]
+  const [open, setOpen] = useState(true)
+  const panelId = 'booking-rules-panel'
   return (
     <div style={{ marginTop: 28, border: '1.5px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
       <button
-        onClick={() => setOpen(o => !o)}
+        type="button"
+        onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
+        aria-controls={panelId}
+        id="booking-rules-trigger"
         style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          gap: 10, padding: '13px 16px',
-          background: 'var(--surface2)', border: 'none', cursor: 'pointer',
-          fontFamily: 'var(--font)', fontSize: 13, fontWeight: 700,
-          color: 'var(--text-2)', textAlign: 'left',
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 10,
+          padding: '13px 16px',
+          background: 'var(--surface2)',
+          border: 'none',
+          cursor: 'pointer',
+          fontFamily: 'var(--font)',
+          fontSize: 14,
+          fontWeight: 800,
+          color: 'var(--text)',
+          textAlign: 'left',
         }}
       >
-        <span style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-          <Icon name="clipboard-list" size={16} /> {t('rulesToggle')}
+        <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Icon name="clipboard-list" size={17} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+          {t('rulesToggle')}
         </span>
-        <Icon name="chevron-down" size={14} style={{ color: 'var(--text-3)', transition: 'transform 0.2s', transform: open ? 'rotate(180deg)' : 'none' }} />
+        <Icon
+          name="chevron-down"
+          size={16}
+          style={{
+            color: 'var(--text-3)',
+            transition: 'transform 0.2s',
+            transform: open ? 'rotate(180deg)' : 'none',
+            flexShrink: 0,
+          }}
+        />
       </button>
       {open && (
-        <div style={{ padding: '16px 18px 18px', background: 'var(--surface)' }}>
-          <p style={{ margin: '0 0 12px', fontSize: 13, fontWeight: 800, color: 'var(--text)' }}>{t('rulesTitle')}</p>
-          <ol style={{ margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            {rules.map((rule, i) => (
-              <li key={i} style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.65 }}>{rule}</li>
+        <div id={panelId} role="region" aria-labelledby="booking-rules-trigger" className="booking-rules__panel">
+          <p className="booking-rules__lead">{t('rulesTitle')}</p>
+          <ul className="booking-rules__list">
+            {BOOKING_RULE_ROWS.map(({ ruleKey, icon, color }) => (
+              <li key={ruleKey} className="booking-rules__item">
+                <div
+                  className="booking-rules__icon-wrap"
+                  style={{ '--rule-accent': color }}
+                  aria-hidden="true"
+                >
+                  <Icon name={icon} size={18} style={{ color }} />
+                </div>
+                <p className="booking-rules__text">
+                  <RuleRichText text={t(ruleKey)} />
+                </p>
+              </li>
             ))}
-          </ol>
-          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 7, paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+          </ul>
+          <div className="booking-rules__links">
             <a
+              className="booking-rules__link"
               href="https://bip.uml.lodz.pl/inne-informacje/ochrona-danych-osobowych/"
-              target="_blank" rel="noopener noreferrer"
-              style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: 5 }}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <Icon name="lock" size={14} /> {t('rule6')}
+              <Icon name="lock" size={16} /> {t('rule6')}
             </a>
             <a
+              className="booking-rules__link"
               href="https://bip.uml.lodz.pl/inne-informacje/polityka-prywatnosci/"
-              target="_blank" rel="noopener noreferrer"
-              style={{ fontSize: 12, color: 'var(--accent)', textDecoration: 'underline', display: 'flex', alignItems: 'center', gap: 5 }}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              <Icon name="file-text" size={14} /> {t('rule7')}
+              <Icon name="file-text" size={16} /> {t('rule7')}
             </a>
           </div>
         </div>
@@ -122,7 +202,7 @@ function BookingRules() {
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
-export default function StepSlots({ onSelect }) {
+export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) {
   const t = useT()
   const { lang } = useLang()
   const pluralService = usePluralService()
@@ -143,6 +223,9 @@ export default function StepSlots({ onSelect }) {
   const [loadingSlots, setLoadingSlots] = useState(false)
 
   function changeViewMode(m) {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
     setViewMode(m)
     localStorage.setItem('uml_view', m)
   }
@@ -168,6 +251,23 @@ export default function StepSlots({ onSelect }) {
     fetchSlots(selectedService.branchId, selectedService.serviceId, selectedDate)
       .then(setSlots).catch(console.error).finally(() => setLoadingSlots(false))
   }, [selectedDate, selectedService])
+
+  useEffect(() => {
+    if (!guidePick) return
+    const { branchId, serviceId } = guidePick
+    const svc = SERVICES.find((s) => s.branchId === branchId && s.serviceId === serviceId)
+    onGuidePickConsumed?.()
+    if (!svc) return
+    setPendingGroupServices(null)
+    setSelectedCategory(svc.category)
+    setSelectedService(svc)
+    setSelectedDate(null)
+    setSlots([])
+    setAvailability({})
+    requestAnimationFrame(() => {
+      document.getElementById('main-content')?.focus({ preventScroll: false })
+    })
+  }, [guidePick, onGuidePickConsumed])
 
   function handleServiceSelect(svc) {
     setSelectedService(svc)
@@ -221,43 +321,80 @@ export default function StepSlots({ onSelect }) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {pendingGroupServices.map((svc, i) => (
-            <button key={i}
-              onClick={() => { handleServiceSelect(svc); setPendingGroupServices(null) }}
-              style={{
-                padding: '18px 20px',
-                background: 'var(--surface)',
-                border: `1.5px solid var(--border)`,
-                borderLeft: `4px solid ${groupMeta.color}`,
-                borderRadius: 14,
-                cursor: 'pointer',
-                textAlign: 'left',
-                fontFamily: 'var(--font)',
-                display: 'flex', alignItems: 'center', gap: 16,
-                transition: 'all var(--transition)',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = `${groupMeta.color}0d`
-                e.currentTarget.style.borderColor = `${groupMeta.color}80`
-                e.currentTarget.style.borderLeftColor = groupMeta.color
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'var(--surface)'
-                e.currentTarget.style.borderColor = 'var(--border)'
-                e.currentTarget.style.borderLeftColor = groupMeta.color
-              }}
-              aria-label={`${officeLabel(svc)}, ${svc.address}`}
+            <div
+              key={i}
+              className="uml-office-card"
+              style={{ ['--card-accent']: groupMeta.color }}
             >
-              <Icon name="map-pin" size={22} style={{ color: groupMeta.color, flexShrink: 0 }} />
-              <span>
-                <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>
-                  {officeLabel(svc)}
+              <button
+                type="button"
+                className="uml-office-card__btn"
+                onClick={() => { handleServiceSelect(svc); setPendingGroupServices(null) }}
+                aria-label={`${officeLabel(svc)}, ${svc.address}. ${t('chooseOffice')}`}
+              >
+                <Icon name="map-pin" size={22} style={{ color: groupMeta.color, flexShrink: 0 }} />
+                <span style={{ minWidth: 0 }}>
+                  <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>
+                    {officeLabel(svc)}
+                  </span>
+                  <span style={{ display: 'block', fontSize: 13, color: 'var(--text-2)', fontWeight: 500, marginTop: 3 }}>
+                    {svc.address}
+                  </span>
                 </span>
-                <span style={{ display: 'block', fontSize: 13, color: 'var(--text-2)', fontWeight: 500, marginTop: 3 }}>
-                  {svc.address}
-                </span>
-              </span>
-              <Icon name="chevron-right" size={18} style={{ color: 'var(--text-3)', marginLeft: 'auto', flexShrink: 0 }} />
-            </button>
+                <Icon name="chevron-right" size={18} style={{ color: 'var(--text-3)', marginLeft: 'auto', flexShrink: 0 }} />
+              </button>
+              <div
+                className="office-card__links"
+                style={{
+                  padding: '8px 16px 14px',
+                  paddingLeft: 50,
+                  borderTop: '1px solid var(--border)',
+                  background: 'var(--surface2)',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  alignItems: 'center',
+                  gap: '4px 8px',
+                }}
+              >
+                <a
+                  href={googleMapsUrl(svc.address)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 800,
+                    color: 'var(--accent)',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                  aria-label={`${t('officeLinkMaps')}: ${svc.address}`}
+                >
+                  <Icon name="map-pinned" size={14} />
+                  {t('officeLinkMaps')}
+                </a>
+                <span style={{ color: 'var(--text-3)', fontWeight: 700, userSelect: 'none' }} aria-hidden="true">·</span>
+                <a
+                  href={UML_BOOKING_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    fontSize: 12,
+                    fontWeight: 800,
+                    color: 'var(--accent)',
+                    textDecoration: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                  aria-label={t('officeLinkOfficial')}
+                >
+                  <Icon name="globe" size={14} />
+                  {t('officeLinkOfficial')}
+                </a>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -315,34 +452,13 @@ export default function StepSlots({ onSelect }) {
                 }).length
                 const catLabel = t(CAT_KEY[cat] || cat)
                 return (
-                  <button key={cat} onClick={() => setSelectedCategory(cat)} style={{
-                    padding: '16px 10px 14px',
-                    background: 'var(--surface)',
-                    border: `1.5px solid var(--border)`,
-                    borderTop: `4px solid ${meta.color}`,
-                    borderRadius: 14,
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    fontFamily: 'var(--font)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    transition: 'all var(--transition)',
-                    minHeight: 110,
-                    minWidth: 0,
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = `${meta.color}0d`
-                    e.currentTarget.style.borderColor = `${meta.color}70`
-                    e.currentTarget.style.borderTopColor = meta.color
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                    e.currentTarget.style.boxShadow = `0 4px 16px ${meta.color}20`
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = 'var(--surface)'
-                    e.currentTarget.style.borderColor = 'var(--border)'
-                    e.currentTarget.style.borderTopColor = meta.color
-                    e.currentTarget.style.transform = 'none'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}>
+                  <button
+                    key={cat}
+                    type="button"
+                    className="uml-picker-btn uml-picker-btn--cat-grid"
+                    onClick={() => setSelectedCategory(cat)}
+                    style={{ ['--card-accent']: meta.color }}
+                  >
                     <Icon name={meta.icon} size={32} strokeWidth={2.35} style={{ color: meta.color }} />
                     <span>
                       <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
@@ -368,29 +484,13 @@ export default function StepSlots({ onSelect }) {
                 }).length
                 const catLabel = t(CAT_KEY[cat] || cat)
                 return (
-                  <button key={cat} onClick={() => setSelectedCategory(cat)} style={{
-                    padding: '16px 18px',
-                    background: 'var(--surface)',
-                    border: '1.5px solid var(--border)',
-                    borderLeft: `4px solid ${meta.color}`,
-                    borderRadius: 14,
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                    fontFamily: 'var(--font)',
-                    display: 'flex', alignItems: 'center', gap: 14,
-                    transition: 'all var(--transition)',
-                    minHeight: 68,
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.background = `${meta.color}0d`
-                    e.currentTarget.style.borderColor = `${meta.color}80`
-                    e.currentTarget.style.borderLeftColor = meta.color
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.background = 'var(--surface)'
-                    e.currentTarget.style.borderColor = 'var(--border)'
-                    e.currentTarget.style.borderLeftColor = meta.color
-                  }}>
+                  <button
+                    key={cat}
+                    type="button"
+                    className="uml-picker-btn uml-picker-btn--cat-list"
+                    onClick={() => setSelectedCategory(cat)}
+                    style={{ ['--card-accent']: meta.color }}
+                  >
                     <Icon name={meta.icon} size={26} strokeWidth={2.35} style={{ color: meta.color, flexShrink: 0 }} />
                     <span style={{ flex: 1 }}>
                       <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
@@ -425,36 +525,13 @@ export default function StepSlots({ onSelect }) {
                   const hasMultipleOffices = svc.serviceGroup &&
                     SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup).length > 1
                   return (
-                    <button key={i} onClick={() => handleServiceCardClick(svc)} style={{
-                      padding: '18px 14px 16px',
-                      background: 'var(--surface)',
-                      border: `1.5px solid var(--border)`,
-                      borderTop: `3px solid ${meta.color}`,
-                      borderRadius: 12,
-                      cursor: 'pointer',
-                      textAlign: 'center',
-                      fontFamily: 'var(--font)',
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: 'var(--text)',
-                      lineHeight: 1.4,
-                      transition: 'all var(--transition)',
-                      minHeight: 110,
-                      minWidth: 0,
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.background = `${meta.color}0d`
-                      e.currentTarget.style.borderColor = `${meta.color}70`
-                      e.currentTarget.style.borderTopColor = meta.color
-                      e.currentTarget.style.transform = 'translateY(-1px)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.background = 'var(--surface)'
-                      e.currentTarget.style.borderColor = 'var(--border)'
-                      e.currentTarget.style.borderTopColor = meta.color
-                      e.currentTarget.style.transform = 'none'
-                    }}>
+                    <button
+                      key={i}
+                      type="button"
+                      className="uml-picker-btn uml-picker-btn--svc-grid"
+                      onClick={() => handleServiceCardClick(svc)}
+                      style={{ ['--card-accent']: meta.color }}
+                    >
                       <Icon name={serviceDisplayIcon(svc)} size={26} strokeWidth={2.25} style={{ color: meta.color }} />
                       <span style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.35 }}>{svcLabel(svc)}</span>
                       {hasMultipleOffices && (() => {
@@ -478,32 +555,13 @@ export default function StepSlots({ onSelect }) {
                     ? SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup).length
                     : 0
                   return (
-                    <button key={i} onClick={() => handleServiceCardClick(svc)} style={{
-                      padding: '15px 18px',
-                      background: 'var(--surface)',
-                      border: '1.5px solid var(--border)',
-                      borderLeft: `4px solid ${meta.color}40`,
-                      borderRadius: 12,
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      fontFamily: 'var(--font)',
-                      fontSize: 15,
-                      fontWeight: 600,
-                      color: 'var(--text)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
-                      minHeight: 64, lineHeight: 1.4,
-                      transition: 'all var(--transition)',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = `${meta.color}80`
-                      e.currentTarget.style.borderLeftColor = meta.color
-                      e.currentTarget.style.background = `${meta.color}0d`
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = 'var(--border)'
-                      e.currentTarget.style.borderLeftColor = `${meta.color}40`
-                      e.currentTarget.style.background = 'var(--surface)'
-                    }}>
+                    <button
+                      key={i}
+                      type="button"
+                      className="uml-picker-btn uml-picker-btn--svc-list"
+                      onClick={() => handleServiceCardClick(svc)}
+                      style={{ ['--card-accent']: meta.color }}
+                    >
                       <Icon name={serviceDisplayIcon(svc)} size={22} strokeWidth={2.25} style={{ color: meta.color, flexShrink: 0 }} />
                       <span style={{ flex: 1 }}>
                         {svcLabel(svc)}
@@ -554,15 +612,28 @@ export default function StepSlots({ onSelect }) {
             <div style={{ minWidth: 0 }}>
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', wordBreak: 'break-word' }}>{svcLabel(selectedService)}</span>
               {selectedService.address && (
-                <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'flex-start', gap: 4, flexWrap: 'wrap', wordBreak: 'break-word' }}>
-                  <Icon name="map-pin" size={12} style={{ flexShrink: 0, marginTop: 2 }} />
-                  <span>
-                  {selectedService.officeLabel && (
-                    <span style={{ fontWeight: 700 }}>{officeLabel(selectedService)} · </span>
-                  )}
-                  {selectedService.address}
-                  </span>
-                </div>
+                <>
+                  <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'flex-start', gap: 4, flexWrap: 'wrap', wordBreak: 'break-word' }}>
+                    <Icon name="map-pin" size={12} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <span>
+                      {selectedService.officeLabel && (
+                        <span style={{ fontWeight: 700 }}>{officeLabel(selectedService)} · </span>
+                      )}
+                      {selectedService.address}
+                    </span>
+                  </div>
+                  <a
+                    className="maps-inline-link"
+                    href={googleMapsUrl(selectedService.address)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ marginTop: 4 }}
+                    aria-label={`${t('officeLinkMaps')}: ${selectedService.address}`}
+                  >
+                    <Icon name="map-pinned" size={14} />
+                    {t('officeLinkMaps')}
+                  </a>
+                </>
               )}
             </div>
           </div>

@@ -19,6 +19,7 @@ import {
   Handshake, Wallet, Ticket, Route, ShieldQuestion,
   FileStack, Home, Building, Umbrella, Sparkles,
   Hammer, Banknote, BadgeCheck,   ContactRound, Globe, CalendarClock,
+  SquareArrowOutUpRight,
 } from 'lucide-react'
 
 const MAP = {
@@ -115,6 +116,7 @@ const MAP = {
   'contact-round': ContactRound,
   globe: Globe,
   'calendar-clock': CalendarClock,
+  'square-arrow-out-up-right': SquareArrowOutUpRight,
 }
 
 export default function Icon({ name, size = 20, className, style, strokeWidth = 2, ...props }) {

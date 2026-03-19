@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { useT, useLang, useDobHint, useServiceLabel } from '../../i18n'
+import { useT, useLang, useDobHint, useServiceLabel, useOfficeLabel } from '../../i18n'
+import { googleMapsUrl } from '../../utils/googleMaps.js'
 import Icon from '../ui/Icon.jsx'
 
 const STORAGE_KEY = 'uml_user_data'
@@ -30,6 +31,7 @@ export default function StepDetails({ booking, onNext, onBack }) {
   const t = useT()
   const dobHint = useDobHint()
   const svcLabel = useServiceLabel()
+  const officeLabel = useOfficeLabel()
   const { lang } = useLang()
   const saved = loadSaved()
   const [form, setForm] = useState({
@@ -85,6 +87,29 @@ export default function StepDetails({ booking, onNext, onBack }) {
           </div>
           {booking.service && (
             <div style={{ fontSize: 13, color: 'var(--text-2)', marginTop: 3, fontWeight: 600, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{svcLabel(booking.service)}</div>
+          )}
+          {booking.service?.address && (
+            <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 8, fontWeight: 600, lineHeight: 1.45, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6px 10px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'flex-start', gap: 4 }}>
+                <Icon name="map-pin" size={14} style={{ flexShrink: 0, marginTop: 2, color: 'var(--accent)' }} />
+                <span>
+                  {booking.service.officeLabel && (
+                    <span style={{ fontWeight: 800 }}>{officeLabel(booking.service)} · </span>
+                  )}
+                  {booking.service.address}
+                </span>
+              </span>
+              <a
+                className="maps-inline-link"
+                href={googleMapsUrl(booking.service.address)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${t('officeLinkMaps')}: ${booking.service.address}`}
+              >
+                <Icon name="map-pinned" size={14} />
+                {t('officeLinkMaps')}
+              </a>
+            </div>
           )}
         </div>
       </div>

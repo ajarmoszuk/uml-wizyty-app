@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import StepSlots from './components/steps/StepSlots.jsx'
 import StepDetails from './components/steps/StepDetails.jsx'
 import StepVerify from './components/steps/StepVerify.jsx'
@@ -19,11 +19,28 @@ export default function App() {
   useEffect(() => {
     cardRef.current?.focus()
     const stepTitles = [t('step0'), t('step1'), t('step2'), t('stepConfirmTitle')]
-    document.title = `${stepTitles[step] || t('bookTitle')} — UML Wizyty`
-  }, [step])
+    document.title = `${stepTitles[step] || t('bookTitle')} — ${t('appBrandName')}`
+  }, [step, t])
   const [booking, setBooking] = useState(null)
   const [details, setDetails] = useState(null)
   const [ticket, setTicket] = useState(null)
+  const [guidePick, setGuidePick] = useState(null)
+
+  const clearGuidePick = useCallback(() => setGuidePick(null), [])
+
+  useEffect(() => {
+    function onPickFromGuide(e) {
+      const d = e.detail
+      if (d?.branchId == null || d?.serviceId == null) return
+      setStep(0)
+      setBooking(null)
+      setDetails(null)
+      setTicket(null)
+      setGuidePick({ branchId: d.branchId, serviceId: d.serviceId })
+    }
+    window.addEventListener('uml:pickServiceFromGuide', onPickFromGuide)
+    return () => window.removeEventListener('uml:pickServiceFromGuide', onPickFromGuide)
+  }, [])
 
   const STEPS = [
     { icon: 'calendar', labelKey: 'step0' },
@@ -92,44 +109,57 @@ export default function App() {
               {t('stepCount', step + 1, 3)}
             </div>
 
-            {/* Step dots */}
-            <ol className="stepper-track" aria-label={t('stepCount', step + 1, 3)}>
-              {STEPS.map((s, i) => {
-                const done = i < step
-                const active = i === step
-                return (
-                  <React.Fragment key={i}>
-                    <li aria-current={active ? 'step' : undefined} className="stepper-item" style={{ transition: 'opacity 0.3s', opacity: (!active && !done) ? 0.3 : 1 }}>
-                      <div style={{
-                        width: 36, height: 36,
-                        borderRadius: '50%',
-                        background: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--surface2)',
-                        border: `2px solid ${active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--border)'}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: (active || done) ? 'white' : 'var(--text-3)',
-                        transition: 'all 0.3s',
-                        flexShrink: 0,
-                      }} aria-hidden="true">
+            {/* Stepper: 3 columns space-between + rail behind dots (line meets circles) */}
+            <nav className="stepper" aria-label={t('stepCount', step + 1, 3)}>
+              <ol className="sr-only">
+                {STEPS.map((s, i) => (
+                  <li key={s.labelKey} aria-current={i === step ? 'step' : undefined}>
+                    {t(s.labelKey)}
+                  </li>
+                ))}
+              </ol>
+              <div
+                className="stepper-visual"
+                aria-hidden="true"
+                style={{
+                  ['--stepper-rail-pct']: step < 1 ? '0%' : step === 1 ? '50%' : '100%',
+                }}
+              >
+                {STEPS.map((s, i) => {
+                  const done = i < step
+                  const active = i === step
+                  return (
+                    <div
+                      key={s.labelKey}
+                      className={`stepper-col${!active && !done ? ' stepper-col--future' : ''}`}
+                    >
+                      <div
+                        className="stepper-dot"
+                        style={{
+                          background: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--surface2)',
+                          border: `2px solid ${active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--border)'}`,
+                          color: (active || done) ? 'white' : 'var(--text-2)',
+                          transition: 'all 0.3s',
+                        }}
+                      >
                         {done ? <Icon name="check" size={16} /> : <Icon name={s.icon} size={16} />}
                       </div>
-                      <span className="stepper-label" style={{ fontWeight: active ? 800 : 600, color: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--text-3)' }}>
+                      <span
+                        className="stepper-label-cell"
+                        style={{
+                          fontWeight: active ? 800 : 600,
+                          color: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--text-2)',
+                          transition: 'opacity 0.3s ease',
+                          opacity: !active && !done ? 0.55 : 1,
+                        }}
+                      >
                         {t(s.labelKey)}
                       </span>
-                    </li>
-                    {i < 2 && (
-                      <li
-                        aria-hidden="true"
-                        className="stepper-connector"
-                        style={{
-                          background: i < step ? 'var(--green)' : 'var(--border)',
-                          transition: 'background 0.4s',
-                        }}
-                      />
-                    )}
-                  </React.Fragment>
-                )
-              })}
-            </ol>
+                    </div>
+                  )
+                })}
+              </div>
+            </nav>
           </div>
         )}
 
@@ -144,7 +174,13 @@ export default function App() {
           minWidth: 0,
           maxWidth: '100%',
         }}>
-          {step === 0 && <StepSlots onSelect={b => { setBooking(b); setStep(1) }} />}
+          {step === 0 && (
+            <StepSlots
+              guidePick={guidePick}
+              onGuidePickConsumed={clearGuidePick}
+              onSelect={b => { setBooking(b); setStep(1) }}
+            />
+          )}
           {step === 1 && <StepDetails booking={booking} onNext={d => { setDetails(d); setStep(2) }} onBack={() => setStep(0)} />}
           {step === 2 && <StepVerify booking={booking} details={details} onSuccess={t => { setTicket(t); setStep(3) }} onBack={() => setStep(1)} />}
           {step === 3 && <StepConfirm booking={booking} ticket={ticket} onReset={reset} />}
@@ -187,7 +223,7 @@ export default function App() {
               href={`https://github.com/ajarmoszuk/uml-wizyty-app/commit/${__GIT_COMMIT__}`}
               target="_blank"
               rel="noopener noreferrer"
-              title="View this commit on GitHub"
+              title={t('commitLinkTitle')}
               style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-3)', textDecoration: 'none', letterSpacing: '0.04em' }}
               onMouseEnter={e => { e.currentTarget.style.color = 'var(--accent)' }}
               onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-3)' }}

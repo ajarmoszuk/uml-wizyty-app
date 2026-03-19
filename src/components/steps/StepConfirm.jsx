@@ -1,10 +1,16 @@
 import React, { useRef, useEffect } from 'react'
-import { useT } from '../../i18n'
+import { useT, useOfficeLabel } from '../../i18n'
+import { googleMapsUrl } from '../../utils/googleMaps.js'
 import Icon from '../ui/Icon.jsx'
 
 export default function StepConfirm({ booking, ticket, onReset }) {
   const t = useT()
+  const officeLabel = useOfficeLabel()
   const lang = t('lang')
+  const street = booking.service?.address?.trim()
+  const addressText = street
+    ? `${booking.service.officeLabel ? `${officeLabel(booking.service)} · ` : ''}${street}, ${t('cityShort')}`
+    : null
   const locale = lang === 'uk' ? 'uk-UA' : lang === 'en' ? 'en-GB' : 'pl-PL'
   const headingRef = useRef(null)
 
@@ -63,7 +69,29 @@ export default function StepConfirm({ booking, ticket, onReset }) {
           </span>
         } />
         <InfoRow label={t('serviceLabel')} value={ticket?.Service?.Name || booking.service.label} />
-        <InfoRow label={t('addressLabel')} value="ul. Smugowa 30/32, Łódź" last />
+        <InfoRow
+          label={t('addressLabel')}
+          value={
+            addressText ? (
+              <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, maxWidth: '100%' }}>
+                <span style={{ wordBreak: 'break-word', textAlign: 'right' }}>{addressText}</span>
+                <a
+                  className="maps-inline-link"
+                  href={googleMapsUrl(street)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${t('officeLinkMaps')}: ${street}`}
+                >
+                  <Icon name="map-pinned" size={14} />
+                  {t('officeLinkMaps')}
+                </a>
+              </span>
+            ) : (
+              t('cityShort')
+            )
+          }
+          last
+        />
       </div>
 
       <div style={{
