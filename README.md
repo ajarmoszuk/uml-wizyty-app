@@ -8,6 +8,8 @@ A fast, human-friendly interface for booking appointments at the Łódź City Of
 
 This wrapper talks to the same servers and does the same thing — just without making you suffer.
 
+> Built with the help of [Claude](https://claude.ai) in ~3 hours and ~$20 in tokens — which is apparently how long it takes an AI to do what Łódź City Hall commissioned from humans.
+
 ---
 
 ## Features

@@ -43,5 +43,5 @@ The system is typically offline for maintenance between 00:00 and 03:00 local ti
 
 - Frontend: React + Vite, deployed on Vercel
 - API: Proxies requests to wizyty.uml.lodz.pl (no backend required)
-- Source: https://github.com/your-repo/uml-wizyty
-- Live app: https://uml-wizyty.vercel.app
+- Source: https://github.com/ajarmoszuk/uml-wizyty-app
+- Live app: https://uml.wizyty.jmkc.pl

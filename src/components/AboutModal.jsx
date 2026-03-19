@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useT } from '../i18n.jsx'
 
-const GITHUB_URL = 'https://github.com/your-repo/uml-wizyty'
+const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
 
 function GitHubIcon() {
   return (
@@ -81,6 +81,11 @@ export default function AboutModal({ onClose }) {
           <span style={{ color: 'var(--text-2)', fontWeight: 700 }}>{'//'} Actual API response from wizyty.uml.lodz.pl:</span>{'\n'}
           {'"ANALYZE": "5 - 5 = 0, CZYLI WYTWORZYŁ 0 DŁUGU",\n"WZÓR": "[ZOBACZ POLE *WZÓR*]",\n"ILOŚĆ DOSTĘPNYCH MIEJSC MIEJSC": "5"'}
         </div>
+
+        {/* Claude note */}
+        <p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 20, fontStyle: 'italic' }}>
+          {t('claudeNote')}
+        </p>
 
         {/* Hire me */}
         <div style={{

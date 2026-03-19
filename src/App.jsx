@@ -166,7 +166,7 @@ export default function App() {
             >CC BY-SA 4.0</a>
             <span style={{ opacity: 0.4 }}>·</span>
             <a
-              href={`https://github.com/your-repo/uml-wizyty/commit/${__GIT_COMMIT__}`}
+              href={`https://github.com/ajarmoszuk/uml-wizyty-app/commit/${__GIT_COMMIT__}`}
               target="_blank"
               rel="noopener noreferrer"
               title="View this commit on GitHub"

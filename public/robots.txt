@@ -17,4 +17,4 @@ Allow: /
 User-agent: GoogleOther
 Allow: /
 
-Sitemap: https://uml-wizyty.vercel.app/sitemap.xml
+Sitemap: https://uml.wizyty.jmkc.pl/sitemap.xml

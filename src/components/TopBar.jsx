@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useLang, useTheme, useT } from '../i18n.jsx'
 import AboutModal from './AboutModal.jsx'
 
-const GITHUB_URL = 'https://github.com/your-repo/uml-wizyty'
+const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
 
 const LANGS = [
   { code: 'pl', flag: '🇵🇱', label: 'Polish', short: 'PL' },

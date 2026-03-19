@@ -128,6 +128,7 @@ export const T = {
     aboutBody: `Oryginalna platforma (wizyty.uml.lodz.pl) jest, delikatnie mówiąc, trudna w użyciu. Odpowiedzi API zawierają kilkanaście kilobajtów wewnętrznych notatek developerskich, polskie nazwy pól w JSON, działania arytmetyczne jako stringi i praktycznie zerową strukturę. Frontend jest wolny, nieintuicyjny i utrudnia nawet najprostszą rezerwację.
 
 Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serwerami uml.lodz.pl, ale prezentuje informacje tak, jakby napisał go człowiek. Nic tutaj nie jest zbierane ani przechowywane. Twoje dane trafiają wyłącznie do serwera urzędu.`,
+    claudeNote: 'Zbudowane z pomocą Claude w ~3 godziny i ~20$ na tokeny. Tyle zajęło AI zrobienie czegoś, co UML zlecił ludziom.',
     aboutDataNote: '🔒 Twoje dane trafiają wyłącznie na serwery uml.lodz.pl. Nic nie jest tutaj zbierane.',
     hireMe: 'Jesteś z Łódzkiego Urzędu?',
     hireMeSub: 'Skontaktuj się ze mną lub zatrudnij mnie —',
@@ -251,6 +252,7 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
 The API returns 15KB of internal developer debug notes per request. Field names are Polish strings embedded in JSON. Arithmetic calculations appear as string values like "5 - 5 = 0, CZYLI WYTWORZYŁ 0 DŁUGU". There is no versioning, no documentation, no structure. The frontend is slow, counter-intuitive, and appears to have never been reviewed by anyone with UX experience.
 
 This project is an unofficial, open-source wrapper that talks to the same city servers but presents the information like a human being wrote it.`,
+    claudeNote: 'Built with Claude in ~3 hours and ~$20 in tokens. That\'s how long it took an AI to do what Łódź City Hall commissioned from humans.',
     aboutDataNote: '🔒 Your data goes directly to uml.lodz.pl servers. Nothing is collected here.',
     hireMe: 'From Łódź City Office?',
     hireMeSub: 'Get in touch or hire me —',
@@ -376,6 +378,7 @@ This project is an unofficial, open-source wrapper that talks to the same city s
 API-відповіді містять 15 кілобайт внутрішніх розробницьких нотаток на кожен запит. Назви JSON-полів — польські рядки. Арифметичні обчислення вбудовані як рядки на зразок "5 - 5 = 0, CZYLI WYTWORZYŁ 0 DŁUGU". Жодного версіонування, жодної документації, жодної структури. Фронтенд повільний і незручний.
 
 Цей проект — неофіційна обгортка з відкритим вихідним кодом, яка звертається до тих самих міських серверів, але представляє інформацію так, ніби її написала людина.`,
+    claudeNote: 'Створено за допомогою Claude за ~3 години і ~$20 на токени. Стільки знадобилось ШІ, щоб зробити те, що Міська рада Лодзі замовила у людей.',
     aboutDataNote: '🔒 Ваші дані надходять напряму на сервери uml.lodz.pl. Тут нічого не збирається.',
     hireMe: 'Ви з Міської ради Лодзі?',
     hireMeSub: "Зв'яжіться зі мною або найміть мене —",
