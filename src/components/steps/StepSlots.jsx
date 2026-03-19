@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
-import { fetchRangeAvailability, fetchSlots, SERVICES, CATEGORY_META } from '../api/booking.js'
-import { useT, useLang, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../i18n.jsx'
-import Icon from './Icon.jsx'
+import { fetchRangeAvailability, fetchSlots, SERVICES, CATEGORY_META, serviceDisplayIcon } from '../../api/booking.js'
+import { useT, useLang, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../../i18n'
+import Icon from '../ui/Icon.jsx'
 
 function toDateStr(d) {
   const y = d.getFullYear()
@@ -200,7 +200,7 @@ export default function StepSlots({ onSelect }) {
   if (!selectedService && pendingGroupServices) {
     const groupMeta = CATEGORY_META[pendingGroupServices[0].category] || { icon: 'clipboard-list', color: '#2563eb' }
     return (
-      <div className="fade-up" style={{ padding: '32px 28px' }}>
+      <div className="fade-up card-padding">
         <button onClick={() => setPendingGroupServices(null)} style={{
           background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 20px',
           fontSize: 13, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font)',
@@ -210,7 +210,7 @@ export default function StepSlots({ onSelect }) {
         </button>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <Icon name={groupMeta.icon} size={24} style={{ color: groupMeta.color, flexShrink: 0 }} />
+          <Icon name={serviceDisplayIcon(pendingGroupServices[0])} size={26} strokeWidth={2.25} style={{ color: groupMeta.color, flexShrink: 0 }} />
           <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
             {svcLabel(pendingGroupServices[0])}
           </h2>
@@ -286,11 +286,11 @@ export default function StepSlots({ onSelect }) {
     const isGrid = viewMode === 'grid'
 
     return (
-      <div className="fade-up" style={{ padding: '32px 28px' }}>
+      <div className="fade-up card-padding">
 
         {/* Heading row with toggle */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 6 }}>
-          <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.01em', lineHeight: 1.2 }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 6, minWidth: 0 }}>
+          <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.01em', lineHeight: 1.2, flex: '1 1 auto', minWidth: 0 }}>
             {selectedCategory ? selectedCatLabel : t('whatNeeded')}
           </h2>
           <ViewToggle viewMode={viewMode} onChange={changeViewMode} />
@@ -303,7 +303,7 @@ export default function StepSlots({ onSelect }) {
           <>
           {isGrid ? (
             // ── CATEGORY GRID ─────────────────────────────────────────────
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+            <div className="grid-safe">
               {CATEGORIES.map(cat => {
                 const meta = CATEGORY_META[cat] || { icon: 'clipboard-list', color: '#374151' }
                 const seen = new Set()
@@ -327,6 +327,7 @@ export default function StepSlots({ onSelect }) {
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
                     transition: 'all var(--transition)',
                     minHeight: 110,
+                    minWidth: 0,
                   }}
                   onMouseEnter={e => {
                     e.currentTarget.style.background = `${meta.color}0d`
@@ -342,7 +343,7 @@ export default function StepSlots({ onSelect }) {
                     e.currentTarget.style.transform = 'none'
                     e.currentTarget.style.boxShadow = 'none'
                   }}>
-                    <Icon name={meta.icon} size={30} style={{ color: meta.color }} />
+                    <Icon name={meta.icon} size={32} strokeWidth={2.35} style={{ color: meta.color }} />
                     <span>
                       <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
                       <span style={{ display: 'block', fontSize: 13, color: 'var(--text-2)', fontWeight: 600, marginTop: 3 }}>
@@ -390,7 +391,7 @@ export default function StepSlots({ onSelect }) {
                     e.currentTarget.style.borderColor = 'var(--border)'
                     e.currentTarget.style.borderLeftColor = meta.color
                   }}>
-                    <Icon name={meta.icon} size={24} style={{ color: meta.color, flexShrink: 0 }} />
+                    <Icon name={meta.icon} size={26} strokeWidth={2.35} style={{ color: meta.color, flexShrink: 0 }} />
                     <span style={{ flex: 1 }}>
                       <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
                       <span style={{ display: 'block', fontSize: 13, color: 'var(--text-3)', fontWeight: 600, marginTop: 2 }}>
@@ -418,7 +419,7 @@ export default function StepSlots({ onSelect }) {
 
             {isGrid ? (
               // ── SERVICE GRID ───────────────────────────────────────────
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+              <div className="grid-safe">
                 {servicesInCategory.map((svc, i) => {
                   const meta = selectedCatMeta || { color: '#2563eb' }
                   const hasMultipleOffices = svc.serviceGroup &&
@@ -439,6 +440,7 @@ export default function StepSlots({ onSelect }) {
                       lineHeight: 1.4,
                       transition: 'all var(--transition)',
                       minHeight: 110,
+                      minWidth: 0,
                       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
                     }}
                     onMouseEnter={e => {
@@ -453,7 +455,7 @@ export default function StepSlots({ onSelect }) {
                       e.currentTarget.style.borderTopColor = meta.color
                       e.currentTarget.style.transform = 'none'
                     }}>
-                      <Icon name={meta.icon} size={24} style={{ color: meta.color }} />
+                      <Icon name={serviceDisplayIcon(svc)} size={26} strokeWidth={2.25} style={{ color: meta.color }} />
                       <span style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.35 }}>{svcLabel(svc)}</span>
                       {hasMultipleOffices && (() => {
                         const cnt = SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup).length
@@ -502,7 +504,7 @@ export default function StepSlots({ onSelect }) {
                       e.currentTarget.style.borderLeftColor = `${meta.color}40`
                       e.currentTarget.style.background = 'var(--surface)'
                     }}>
-                      <Icon name={meta.icon} size={20} style={{ color: meta.color, flexShrink: 0 }} />
+                      <Icon name={serviceDisplayIcon(svc)} size={22} strokeWidth={2.25} style={{ color: meta.color, flexShrink: 0 }} />
                       <span style={{ flex: 1 }}>
                         {svcLabel(svc)}
                         {officeCount > 1 && (
@@ -533,29 +535,33 @@ export default function StepSlots({ onSelect }) {
   const canPrevMonth = viewMonth > new Date(today.getFullYear(), today.getMonth(), 1)
 
   return (
-    <div className="fade-up" style={{ padding: '32px 28px' }}>
+    <div className="fade-up card-padding">
 
       {/* Selected service chip */}
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: `${meta.color}12`,
-        border: `1.5px solid ${meta.color}40`,
-        borderRadius: 12, padding: '10px 14px', marginBottom: 24, gap: 12,
-      }}>
-        <div>
-          <div style={{ fontSize: 11, fontWeight: 700, color: meta.color, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
-            <Icon name={meta.icon} size={13} style={{ color: meta.color }} /> {t(CAT_KEY[selectedService.category] || selectedService.category)}
+      <div
+        className="service-chip"
+        style={{
+          background: `${meta.color}12`,
+          border: `1.5px solid ${meta.color}40`,
+          borderRadius: 12, padding: '10px 14px', marginBottom: 24,
+        }}
+      >
+        <div className="service-chip-main">
+          <div style={{ fontSize: 11, fontWeight: 700, color: meta.color, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 2, display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+            <Icon name={serviceDisplayIcon(selectedService)} size={15} strokeWidth={2.25} style={{ color: meta.color, flexShrink: 0 }} /> {t(CAT_KEY[selectedService.category] || selectedService.category)}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div>
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{svcLabel(selectedService)}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <div style={{ minWidth: 0 }}>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', wordBreak: 'break-word' }}>{svcLabel(selectedService)}</span>
               {selectedService.address && (
-                <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <Icon name="map-pin" size={12} />
+                <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'flex-start', gap: 4, flexWrap: 'wrap', wordBreak: 'break-word' }}>
+                  <Icon name="map-pin" size={12} style={{ flexShrink: 0, marginTop: 2 }} />
+                  <span>
                   {selectedService.officeLabel && (
                     <span style={{ fontWeight: 700 }}>{officeLabel(selectedService)} · </span>
                   )}
                   {selectedService.address}
+                  </span>
                 </div>
               )}
             </div>
@@ -564,25 +570,25 @@ export default function StepSlots({ onSelect }) {
         <button onClick={handleChangeService} style={{
           background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0,
           fontSize: 12, fontWeight: 700, color: 'var(--text-3)', fontFamily: 'var(--font)',
-          padding: '4px 8px', borderRadius: 6, whiteSpace: 'nowrap',
+          padding: '4px 8px', borderRadius: 6, whiteSpace: 'nowrap', alignSelf: 'flex-start',
         }}>
           {t('changeService')}
         </button>
       </div>
 
-      <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', marginBottom: 20, letterSpacing: '-0.01em' }}>
+      <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', marginBottom: 20, letterSpacing: '-0.01em', lineHeight: 1.3, wordBreak: 'break-word' }}>
         {t('whenCome')}
       </h2>
 
       {/* Month nav */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div className="month-nav" style={{ marginBottom: 16 }}>
         <NavBtn
           onClick={() => setViewMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1))}
           disabled={!canPrevMonth}
           ariaLabel={t('prevMonthLabel')}>
           {t('prevMonth')}
         </NavBtn>
-        <div style={{ fontWeight: 800, fontSize: 18, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 8 }} aria-live="polite" aria-atomic="true">
+        <div className="month-nav-title" style={{ fontWeight: 800, color: 'var(--text)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }} aria-live="polite" aria-atomic="true">
           {t('months')[viewMonth.getMonth()]} {viewMonth.getFullYear()}
           {loadingCal && <Spinner size={14} />}
         </div>
@@ -594,9 +600,9 @@ export default function StepSlots({ onSelect }) {
       </div>
 
       {/* Day headers */}
-      <div role="row" style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 4 }}>
+      <div role="row" className="cal-week" style={{ marginBottom: 4 }}>
         {t('days').map(d => (
-          <div key={d} role="columnheader" aria-label={d} style={{ textAlign: 'center', fontSize: 12, fontWeight: 800, color: 'var(--text-3)', padding: '4px 0', letterSpacing: '0.04em' }}>
+          <div key={d} role="columnheader" aria-label={d} className="cal-dow" style={{ textAlign: 'center', fontWeight: 800, color: 'var(--text-3)', padding: '4px 0' }}>
             {d}
           </div>
         ))}
@@ -604,7 +610,7 @@ export default function StepSlots({ onSelect }) {
 
       {/* Legend */}
       {!loadingCal && Object.keys(availability).length > 0 && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, fontSize: 13, color: 'var(--text-3)', fontWeight: 600 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, fontSize: 13, color: 'var(--text-3)', fontWeight: 600, flexWrap: 'wrap' }}>
           <div style={{ width: 12, height: 12, borderRadius: 3, background: 'var(--accent-light)', border: '1px solid var(--accent)', flexShrink: 0 }} aria-hidden="true" />
           {t('calendarLegend')}
         </div>
@@ -624,7 +630,7 @@ export default function StepSlots({ onSelect }) {
       <div role="region" aria-live="polite" aria-atomic="false" aria-label={t('availableHours')}>
         {selectedDate && (
           <div className="fade-up" style={{ borderTop: '1px solid var(--border)', paddingTop: 24 }}>
-            <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', marginBottom: 16, letterSpacing: '-0.01em' }}>
+            <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', marginBottom: 16, letterSpacing: '-0.01em', lineHeight: 1.35, wordBreak: 'break-word' }}>
               {t('availableHours')} {t('on')} <span style={{ color: 'var(--accent)', textTransform: 'lowercase' }}>{formatDateLong(selectedDate, lang)}</span>
             </h2>
 
@@ -645,14 +651,14 @@ export default function StepSlots({ onSelect }) {
             )}
 
             {!loadingSlots && slots.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+              <div className="slot-grid">
                 {slots.map((s, i) => (
                   <button key={i}
-                    className="pop-in"
+                    className="pop-in slot-btn"
                     aria-label={`${s.time} — ${s.slots === 1 ? t('slot1') : t('slotsN', s.slots)}`}
                     style={{
                       animationDelay: `${i * 25}ms`,
-                      padding: '14px 22px',
+                      padding: '14px clamp(12px, 4vw, 22px)',
                       background: 'var(--surface)',
                       border: '2px solid var(--border)',
                       borderRadius: 12,
@@ -660,7 +666,6 @@ export default function StepSlots({ onSelect }) {
                       transition: 'all var(--transition)',
                       fontFamily: 'var(--font)',
                       textAlign: 'center',
-                      minWidth: 90,
                     }}
                     onMouseEnter={e => {
                       e.currentTarget.style.borderColor = 'var(--accent)'
@@ -736,7 +741,7 @@ function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, 
   }
 
   return (
-    <div ref={gridRef} role="grid" aria-label={t('months')[cells.find(Boolean)?.getMonth()] + ' ' + cells.find(Boolean)?.getFullYear()} style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, marginBottom: 28 }}>
+    <div ref={gridRef} role="grid" className="cal-week" aria-label={t('months')[cells.find(Boolean)?.getMonth()] + ' ' + cells.find(Boolean)?.getFullYear()} style={{ marginBottom: 28 }}>
       {cells.map((date, i) => {
         if (!date) return <div key={i} role="gridcell" />
         const ds = toDateStr(date)
@@ -767,7 +772,6 @@ function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, 
               aspectRatio: '1',
               border: 'none',
               borderRadius: 10,
-              fontSize: 15,
               fontWeight: isSelected ? 900 : hasSlots ? 700 : 400,
               fontFamily: 'var(--font)',
               display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -780,6 +784,7 @@ function CalendarGrid({ cells, today, availability, selectedDate, onSelectDate, 
                 : hasSlots ? 'var(--accent)'
                 : 'var(--text-3)',
               opacity: (isPast || isWeekend) ? 0.25 : 1,
+              minWidth: 0,
             }}>
             {date.getDate()}
             {hasSlots && !isSelected && (
@@ -799,6 +804,7 @@ function NavBtn({ children, onClick, disabled, ariaLabel }) {
       fontSize: 14, fontWeight: 700, color: disabled ? 'var(--text-3)' : 'var(--accent)',
       fontFamily: 'var(--font)', padding: '6px 10px', borderRadius: 6, minHeight: 40,
       opacity: disabled ? 0.4 : 1, transition: 'opacity 0.2s',
+      flexShrink: 0,
     }}>
       {children}
     </button>

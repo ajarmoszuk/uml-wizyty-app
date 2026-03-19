@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react'
-import { useT } from '../i18n.jsx'
-import Icon from './Icon.jsx'
+import { useT } from '../../i18n'
+import Icon from '../ui/Icon.jsx'
 
 export default function StepConfirm({ booking, ticket, onReset }) {
   const t = useT()
@@ -17,7 +17,7 @@ export default function StepConfirm({ booking, ticket, onReset }) {
   })
 
   return (
-    <div className="fade-up" style={{ padding: '40px 28px', textAlign: 'center', maxWidth: 520, margin: '0 auto' }}>
+    <div className="fade-up card-padding" style={{ textAlign: 'center', maxWidth: 520, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
 
       <div style={{
         width: 72, height: 72, borderRadius: '50%',
@@ -39,15 +39,18 @@ export default function StepConfirm({ booking, ticket, onReset }) {
       <div style={{
         background: 'var(--surface2)',
         border: '1.5px solid var(--border)',
-        borderRadius: 16, padding: '24px 28px',
+        borderRadius: 16,
+        padding: 'clamp(16px, 4vw, 24px) clamp(14px, 4vw, 28px)',
         textAlign: 'left', marginBottom: 24,
+        maxWidth: '100%',
+        boxSizing: 'border-box',
       }}>
         {ticket?.TicketNumber && (
           <div style={{ textAlign: 'center', marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid var(--border)' }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 4 }}>
               {t('ticketNumber')}
             </div>
-            <div style={{ fontSize: 38, fontWeight: 900, color: 'var(--accent)', letterSpacing: '0.08em' }}>
+            <div style={{ fontSize: 'clamp(1.5rem, 8vw, 2.4rem)', fontWeight: 900, color: 'var(--accent)', letterSpacing: '0.08em', wordBreak: 'break-all' }}>
               {ticket.TicketNumber}
             </div>
           </div>
@@ -90,14 +93,16 @@ export default function StepConfirm({ booking, ticket, onReset }) {
 function InfoRow({ label, value, last }) {
   return (
     <div style={{
-      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
+      flexWrap: 'wrap',
+      gap: 8,
       paddingBottom: last ? 0 : 14, marginBottom: last ? 0 : 14,
       borderBottom: last ? 'none' : '1px solid var(--border)',
     }}>
-      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+      <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', flex: '1 1 40%', minWidth: 0 }}>
         {label}
       </span>
-      <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', textAlign: 'right', maxWidth: '60%' }}>
+      <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', textAlign: 'right', flex: '1 1 55%', minWidth: 0, wordBreak: 'break-word' }}>
         {value}
       </span>
     </div>

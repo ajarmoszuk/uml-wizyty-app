@@ -261,4 +261,4 @@ No backend server is required in either case.
 
 This entire project — reverse-engineering the API, building the UI, accessibility, i18n (PL/EN/UK), dark mode, caching, SEO, and this documentation — was built with the help of [Claude](https://claude.ai) in approximately **3 hours** and roughly **$20 in API tokens**.
 
-That is apparently how long it takes an AI to do what Łódź City Hall commissioned from humans.
+That figure is shared only as context on the scale of a side experiment, not as criticism of institutional procurement or teams.

@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { useLang, useTheme, useT } from '../i18n.jsx'
+import React, { useState, useEffect } from 'react'
+import { useLang, useTheme, useT } from '../../i18n'
 import AboutModal from './AboutModal.jsx'
-import Icon from './Icon.jsx'
+import Icon from '../ui/Icon.jsx'
 
 const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
 
@@ -45,6 +45,12 @@ export default function TopBar() {
   const t = useT()
   const [showAbout, setShowAbout] = useState(false)
 
+  useEffect(() => {
+    const open = () => setShowAbout(true)
+    window.addEventListener('uml:openabout', open)
+    return () => window.removeEventListener('uml:openabout', open)
+  }, [])
+
   const iconBtn = {
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     width: 40, height: 40, borderRadius: 8,
@@ -59,6 +65,7 @@ export default function TopBar() {
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'flex-end',
         gap: 8, marginBottom: 20, flexWrap: 'wrap',
+        width: '100%', minWidth: 0,
       }}>
 
         {/* About */}

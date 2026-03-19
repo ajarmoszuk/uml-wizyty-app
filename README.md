@@ -8,7 +8,7 @@ A fast, human-friendly interface for booking appointments at the Łódź City Of
 
 This wrapper talks to the same servers and does the same thing — just without making you suffer.
 
-> Built with the help of [Claude](https://claude.ai) in ~3 hours and ~$20 in tokens — which is apparently how long it takes an AI to do what Łódź City Hall commissioned from humans.
+> Built with the help of [Claude](https://claude.ai) in about **3 hours** and roughly **$20** in API tokens — mostly as context on how fast a spare-time wrapper can come together, not as commentary on anyone’s official IT projects.
 
 ---
 
@@ -59,19 +59,27 @@ location /api/ {
 ```
 src/
 ├── api/
-│   └── booking.js          # All API calls + SERVICES list + CATEGORY_META
+│   └── booking.js              # API calls + SERVICES + CATEGORY_META
 ├── components/
-│   ├── AboutModal.jsx       # "About this project" dialog
-│   ├── StepConfirm.jsx      # Step 4 — booking confirmation
-│   ├── StepDetails.jsx      # Step 2 — personal details form
-│   ├── StepSlots.jsx        # Step 1 — service & date/time picker
-│   ├── StepVerify.jsx       # Step 3 — SMS verification
-│   └── TopBar.jsx           # Language switcher, dark mode toggle, GitHub link
-├── App.jsx                  # Step orchestration and progress indicator
-├── i18n.jsx                 # Translations (PL/EN/UK) + theme/lang contexts
-├── index.css                # CSS variables, animations, global styles
-└── main.jsx                 # Entry point
+│   ├── layout/                 # Shell: TopBar, AboutModal, LodzCOA, SystemBanner
+│   ├── steps/                  # Booking flow: StepSlots → Details → Verify → Confirm
+│   └── ui/                     # Shared Icon (Lucide map)
+├── hooks/
+│   └── useSystemBanners.js     # Offline / maintenance banner state
+├── i18n/
+│   ├── index.js                # Public exports (import from `src/i18n`)
+│   ├── translations.js       # Plain strings (PL / EN / UK) + CAT_KEY
+│   └── context.jsx             # Lang + theme providers and hooks
+├── App.jsx                     # Step orchestration and progress indicator
+├── index.css
+└── main.jsx
+public/
+└── lodz-coa.svg                # Łódź COA (identification only; see README)
 ```
+
+## Coat of arms (`public/lodz-coa.svg`)
+
+The Łódź coat of arms image is shown **only** so users recognise which office the booking flow refers to. **This repository and website are not run by Urząd Miasta Łodzi.** If you replace the SVG, keep its licence/attribution requirements (e.g. if you use a Wikimedia Commons file). A copy may also exist in the repo root under the original filename — the app **serves** the file from `public/lodz-coa.svg`.
 
 ## Disclaimer
 

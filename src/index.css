@@ -51,7 +51,10 @@
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
 }
 
-html { font-size: 17px; }
+html {
+  font-size: clamp(15px, 2.8vw, 17px);
+  overflow-x: hidden;
+}
 body {
   background: var(--bg);
   color: var(--text);
@@ -59,6 +62,185 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.app-root {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  padding-block-start: max(clamp(12px, 3.5vw, 24px), env(safe-area-inset-top, 0px));
+  padding-inline-end: max(clamp(10px, 3vw, 16px), env(safe-area-inset-right, 0px));
+  padding-block-end: max(clamp(40px, 10vw, 64px), env(safe-area-inset-bottom, 0px));
+  padding-inline-start: max(clamp(10px, 3vw, 16px), env(safe-area-inset-left, 0px));
+}
+.app-inner {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  min-width: 0;
+}
+
+/* Step cards & modals: fluid horizontal padding */
+.card-padding {
+  padding: clamp(16px, 5vw, 32px) clamp(12px, 4vw, 28px);
+  min-width: 0;
+}
+
+/* Category / service grids: prevent overflow from long words */
+.grid-safe {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(6px, 2vw, 10px);
+}
+@media (max-width: 360px) {
+  .grid-safe {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Calendar: keep 7 columns but allow shrinking */
+.cal-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(2px, 1vw, 4px);
+}
+.cal-week button {
+  min-width: 0;
+  font-size: clamp(12px, 3.4vw, 15px) !important;
+}
+.cal-dow {
+  font-size: clamp(9px, 2.5vw, 12px) !important;
+  letter-spacing: 0.02em;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
+}
+
+/* Month navigation: wrap on very narrow screens */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.month-nav-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: center;
+  font-size: clamp(14px, 4vw, 18px);
+  order: 0;
+}
+@media (max-width: 400px) {
+  .month-nav {
+    justify-content: center;
+  }
+  .month-nav-title {
+    flex-basis: 100%;
+    order: -1;
+    margin-bottom: 4px;
+  }
+}
+
+/* Service summary chip: stack on narrow */
+.service-chip {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.service-chip-main {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+/* Time slot buttons */
+.slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(8px, 2vw, 10px);
+  justify-content: flex-start;
+}
+.slot-btn {
+  min-width: min(90px, 42vw);
+  max-width: 100%;
+  flex: 1 1 auto;
+}
+
+/* Form action rows */
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(20px, 5vw, 32px);
+}
+.form-actions > button {
+  flex: 1 1 140px;
+  min-width: min(100%, 140px);
+}
+
+/* SMS code inputs */
+.otp-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(6px, 2vw, 12px);
+  justify-content: center;
+  margin-bottom: 20px;
+  max-width: 100%;
+}
+.otp-row input {
+  width: clamp(48px, 16vw, 64px) !important;
+  height: clamp(56px, 18vw, 72px) !important;
+  font-size: clamp(22px, 7vw, 30px) !important;
+}
+
+/* Stepper: allow labels to wrap on small screens */
+.stepper-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  list-style: none;
+  padding: 0;
+  flex-wrap: nowrap;
+  max-width: 100%;
+}
+.stepper-track > li {
+  list-style: none;
+}
+.stepper-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 33%;
+  min-width: 0;
+}
+.stepper-label {
+  font-size: clamp(10px, 2.6vw, 12px);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.25;
+  word-break: break-word;
+  hyphens: auto;
+  padding: 0 2px;
+}
+.stepper-connector {
+  width: clamp(16px, 7vw, 56px);
+  height: 3px;
+  margin: 0 2px 22px;
+  border-radius: 2px;
+  flex-shrink: 0;
+  list-style: none;
+  align-self: center;
+}
+
+.app-title {
+  font-size: clamp(1.35rem, 6vw, 1.85rem);
+  line-height: 1.1;
 }
 input, button, select, textarea { font-family: var(--font); }
 

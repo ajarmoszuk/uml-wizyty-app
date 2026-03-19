@@ -324,16 +324,90 @@ export const SERVICES = [
 ]
 
 export const CATEGORY_META = {
-  'Pojazdy':                        { icon: 'car',             color: '#2563eb' },
-  'Prawa jazdy':                    { icon: 'key-round',       color: '#7c3aed' },
-  'Dowody osobiste i meldunki':     { icon: 'id-card',         color: '#0891b2' },
-  'Urząd Stanu Cywilnego':          { icon: 'heart',           color: '#b45309' },
-  'Nadzór i kontrola':              { icon: 'shield-check',    color: '#374151' },
-  'Centrum Kontaktu z Mieszkańcami':{ icon: 'headphones',      color: '#059669' },
-  'Podatki i opłaty':               { icon: 'receipt',         color: '#dc2626' },
-  'Osoby z niepełnosprawnością':    { icon: 'accessibility',   color: '#0284c7' },
-  'Egzekucja i windykacja':         { icon: 'scale',           color: '#7f1d1d' },
-  'Działalność gospodarcza':        { icon: 'briefcase',       color: '#1e40af' },
+  'Pojazdy':                        { icon: 'car-front',       color: '#2563eb' },
+  'Prawa jazdy':                    { icon: 'credit-card',     color: '#7c3aed' },
+  'Dowody osobiste i meldunki':     { icon: 'fingerprint',     color: '#0891b2' },
+  'Urząd Stanu Cywilnego':          { icon: 'scroll-text',     color: '#b45309' },
+  'Nadzór i kontrola':              { icon: 'school',          color: '#374151' },
+  'Centrum Kontaktu z Mieszkańcami':{ icon: 'building2',       color: '#059669' },
+  'Podatki i opłaty':               { icon: 'landmark',        color: '#dc2626' },
+  'Osoby z niepełnosprawnością':    { icon: 'handshake',       color: '#0284c7' },
+  'Egzekucja i windykacja':         { icon: 'gavel',           color: '#7f1d1d' },
+  'Działalność gospodarcza':        { icon: 'store',           color: '#1e40af' },
+}
+
+/** Shared icon for multi-office grouped services */
+const SERVICE_GROUP_ICONS = {
+  id_application: 'file-signature',
+  id_collection: 'package-open',
+  population_register: 'users-round',
+  pesel_reservation: 'hash',
+  info_help: 'life-buoy',
+}
+
+/** Per-location icon for services without serviceGroup */
+const SERVICE_ICON_BY_KEY = {
+  '8-60': 'car-front',
+  '8-61': 'calendar-clock',
+  '8-62': 'wrench',
+  '8-63': 'file-badge',
+  '47-98': 'user-plus',
+  '47-99': 'truck',
+  '47-100': 'refresh-cw',
+  '47-101': 'badge-check',
+  '47-102': 'file-edit',
+  '47-103': 'ban',
+  '19-18': 'globe',
+  '9-97': 'scroll',
+  '10-29': 'pen-line',
+  '10-30': 'file-stack',
+  '11-31': 'baby',
+  '11-32': 'cake',
+  '7-58': 'graduation-cap',
+  '7-59': 'gauge',
+  '58-117': 'info',
+  '58-118': 'send',
+  '58-119': 'map-pinned',
+  '58-120': 'ticket',
+  '58-121': 'badge-check',
+  '58-122': 'route',
+  '58-123': 'trees',
+  '58-124': 'shield-check',
+  '43-76': 'package-open',
+  '34-57': 'home',
+  '34-66': 'wallet',
+  '34-67': 'umbrella',
+  '38-86': 'building',
+  '38-87': 'banknote',
+  '38-105': 'sparkles',
+  '35-71': 'trees',
+  '35-107': 'piggy-bank',
+  '35-108': 'shield-question',
+  '39-88': 'truck',
+  '39-110': 'credit-card',
+  '39-111': 'hammer',
+  '36-77': 'clipboard-list',
+  '36-126': 'clipboard-check',
+  '36-112': 'scan-search',
+  '40-89': 'search',
+  '41-90': 'stamp',
+  '30-53': 'contact-round',
+  '30-54': 'id-card',
+  '30-55': 'message-square',
+  '30-56': 'sparkles',
+  '32-93': 'hammer',
+  '33-104': 'scale',
+  '45-95': 'beer',
+  '44-94': 'bus',
+  '46-96': 'factory',
+}
+
+export function serviceDisplayIcon(svc) {
+  if (svc.serviceGroup && SERVICE_GROUP_ICONS[svc.serviceGroup]) {
+    return SERVICE_GROUP_ICONS[svc.serviceGroup]
+  }
+  const k = `${svc.branchId}-${svc.serviceId}`
+  return SERVICE_ICON_BY_KEY[k] || CATEGORY_META[svc.category]?.icon || 'clipboard-list'
 }
 
 // Detect probable server-side maintenance from a fetch TypeError.

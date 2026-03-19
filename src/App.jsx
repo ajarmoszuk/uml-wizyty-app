@@ -1,47 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react'
-import StepSlots from './components/StepSlots.jsx'
-import StepDetails from './components/StepDetails.jsx'
-import StepVerify from './components/StepVerify.jsx'
-import StepConfirm from './components/StepConfirm.jsx'
-import TopBar from './components/TopBar.jsx'
-import LodzCOA from './components/LodzCOA.jsx'
-import { useT } from './i18n.jsx'
-import Icon from './components/Icon.jsx'
-
-function useSystemBanners() {
-  const [isOffline, setIsOffline] = useState(!navigator.onLine)
-  const [offlineDismissed, setOfflineDismissed] = useState(false)
-  const [maintenanceDismissed, setMaintenanceDismissed] = useState(false)
-  const [connectionReset, setConnectionReset] = useState(false)
-  const [connectionResetDismissed, setConnectionResetDismissed] = useState(false)
-
-  useEffect(() => {
-    const goOffline = () => { setIsOffline(true); setOfflineDismissed(false) }
-    const goOnline  = () => setIsOffline(false)
-    // PR_CONNECT_RESET_ERROR / ERR_CONNECTION_RESET → server maintenance
-    const onReset = () => { setConnectionReset(true); setConnectionResetDismissed(false) }
-    window.addEventListener('offline', goOffline)
-    window.addEventListener('online',  goOnline)
-    window.addEventListener('uml:connectionreset', onReset)
-    return () => {
-      window.removeEventListener('offline', goOffline)
-      window.removeEventListener('online',  goOnline)
-      window.removeEventListener('uml:connectionreset', onReset)
-    }
-  }, [])
-
-  const hour = new Date().getHours()
-  const isTimeWindow = hour >= 0 && hour < 3
-  const isMaintenance = isTimeWindow || connectionReset
-
-  return {
-    showOffline:           isOffline && !offlineDismissed,
-    showMaintenance:       !isOffline && isMaintenance && !maintenanceDismissed,
-    isConnectionReset:     connectionReset && !isTimeWindow, // flag to show specific message
-    dismissOffline:        () => setOfflineDismissed(true),
-    dismissMaintenance:    () => { setMaintenanceDismissed(true); setConnectionResetDismissed(true) },
-  }
-}
+import StepSlots from './components/steps/StepSlots.jsx'
+import StepDetails from './components/steps/StepDetails.jsx'
+import StepVerify from './components/steps/StepVerify.jsx'
+import StepConfirm from './components/steps/StepConfirm.jsx'
+import TopBar from './components/layout/TopBar.jsx'
+import LodzCOA from './components/layout/LodzCOA.jsx'
+import SystemBanner from './components/layout/SystemBanner.jsx'
+import { useT } from './i18n'
+import { useSystemBanners } from './hooks/useSystemBanners.js'
+import Icon from './components/ui/Icon.jsx'
 
 export default function App() {
   const t = useT()
@@ -69,9 +36,9 @@ export default function App() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '24px 16px 64px' }}>
+    <div className="app-root" style={{ minHeight: '100vh', background: 'var(--bg)' }}>
       <a href="#main-content" className="skip-link">{t('skipToMain')}</a>
-      <div style={{ maxWidth: 680, margin: '0 auto' }}>
+      <div className="app-inner">
 
         <TopBar />
 
@@ -92,10 +59,27 @@ export default function App() {
           <div style={{ display: 'inline-block', marginBottom: 10, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.22))' }}>
             <LodzCOA size={44} />
           </div>
+          <p
+            role="note"
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              lineHeight: 1.45,
+              color: 'var(--orange)',
+              background: 'var(--orange-light)',
+              border: '1.5px solid color-mix(in srgb, var(--orange) 45%, transparent)',
+              borderRadius: 10,
+              padding: '8px 14px',
+              margin: '0 auto 12px',
+              maxWidth: 420,
+            }}
+          >
+            {t('headerUnofficialBadge')}
+          </p>
           <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>
             {t('city')}
           </div>
-          <h1 style={{ fontSize: 30, fontWeight: 900, color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+          <h1 className="app-title" style={{ fontWeight: 900, color: 'var(--text)', letterSpacing: '-0.02em' }}>
             {t('bookTitle')}
           </h1>
         </div>
@@ -109,13 +93,13 @@ export default function App() {
             </div>
 
             {/* Step dots */}
-            <ol aria-label={t('stepCount', step + 1, 3)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, listStyle: 'none', padding: 0 }}>
+            <ol className="stepper-track" aria-label={t('stepCount', step + 1, 3)}>
               {STEPS.map((s, i) => {
                 const done = i < step
                 const active = i === step
                 return (
                   <React.Fragment key={i}>
-                    <li aria-current={active ? 'step' : undefined} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, transition: 'opacity 0.3s', opacity: (!active && !done) ? 0.3 : 1 }}>
+                    <li aria-current={active ? 'step' : undefined} className="stepper-item" style={{ transition: 'opacity 0.3s', opacity: (!active && !done) ? 0.3 : 1 }}>
                       <div style={{
                         width: 36, height: 36,
                         borderRadius: '50%',
@@ -124,19 +108,23 @@ export default function App() {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: (active || done) ? 'white' : 'var(--text-3)',
                         transition: 'all 0.3s',
+                        flexShrink: 0,
                       }} aria-hidden="true">
                         {done ? <Icon name="check" size={16} /> : <Icon name={s.icon} size={16} />}
                       </div>
-                      <span style={{ fontSize: 12, fontWeight: active ? 800 : 600, color: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--text-3)', whiteSpace: 'nowrap' }}>
+                      <span className="stepper-label" style={{ fontWeight: active ? 800 : 600, color: active ? 'var(--accent)' : done ? 'var(--green)' : 'var(--text-3)' }}>
                         {t(s.labelKey)}
                       </span>
                     </li>
                     {i < 2 && (
-                      <li aria-hidden="true" style={{
-                        width: 56, height: 3, margin: '0 4px', marginBottom: 24,
-                        background: i < step ? 'var(--green)' : 'var(--border)',
-                        borderRadius: 2, transition: 'background 0.4s', flexShrink: 0,
-                      }} />
+                      <li
+                        aria-hidden="true"
+                        className="stepper-connector"
+                        style={{
+                          background: i < step ? 'var(--green)' : 'var(--border)',
+                          transition: 'background 0.4s',
+                        }}
+                      />
                     )}
                   </React.Fragment>
                 )
@@ -153,6 +141,8 @@ export default function App() {
           overflow: 'hidden',
           border: '1px solid var(--border)',
           outline: 'none',
+          minWidth: 0,
+          maxWidth: '100%',
         }}>
           {step === 0 && <StepSlots onSelect={b => { setBooking(b); setStep(1) }} />}
           {step === 1 && <StepDetails booking={booking} onNext={d => { setDetails(d); setStep(2) }} onBack={() => setStep(0)} />}
@@ -164,6 +154,22 @@ export default function App() {
           <div>{t('unofficial')}</div>
           <div style={{ fontSize: 11, color: 'var(--text-3)', opacity: 0.75, fontFamily: 'monospace', marginTop: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
             <Icon name="lock" size={11} /> {t('proxyNote')}
+          </div>
+          <div style={{ marginTop: 10, maxWidth: 520, marginLeft: 'auto', marginRight: 'auto', fontSize: 11, lineHeight: 1.55, color: 'var(--text-3)', opacity: 0.82 }}>
+            {t('footerBuildHint')}{' '}
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('uml:openabout'))}
+              aria-label={t('aboutTitle')}
+              style={{
+                background: 'none', border: 'none', padding: 0, margin: 0,
+                color: 'var(--accent)', fontWeight: 700, cursor: 'pointer',
+                fontFamily: 'inherit', fontSize: 'inherit', textDecoration: 'underline',
+                textUnderlineOffset: 2,
+              }}
+            >
+              {t('about')}
+            </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
             <span>© 2026 Aleksander Jarmoszuk</span>
@@ -189,30 +195,6 @@ export default function App() {
           </div>
         </div>
       </div>
-    </div>
-  )
-}
-
-function SystemBanner({ icon, color, bg, onDismiss, children }) {
-  const t = useT()
-  return (
-    <div role="alert" style={{
-      display: 'flex', alignItems: 'flex-start', gap: 10,
-      background: bg, border: `1.5px solid ${color}`,
-      borderRadius: 12, padding: '12px 14px',
-      marginBottom: 16, color,
-    }}>
-      <Icon name={icon} size={18} style={{ flexShrink: 0, marginTop: 2 }} />
-      <span style={{ flex: 1, fontSize: 14, fontWeight: 600, lineHeight: 1.55 }}>{children}</span>
-      <button
-        onClick={onDismiss}
-        aria-label={t('bannerDismiss')}
-        style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          color, padding: '0 2px', flexShrink: 0,
-          display: 'flex', alignItems: 'center',
-        }}
-      ><Icon name="x" size={18} /></button>
     </div>
   )
 }

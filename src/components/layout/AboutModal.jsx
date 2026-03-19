@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
-import { useT } from '../i18n.jsx'
-import Icon from './Icon.jsx'
+import { useT } from '../../i18n'
+import Icon from '../ui/Icon.jsx'
 
 const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
 
@@ -48,7 +48,7 @@ export default function AboutModal({ onClose }) {
         position: 'fixed', inset: 0, zIndex: 1000,
         background: 'var(--modal-overlay)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '20px 16px',
+        padding: 'clamp(12px, 3vw, 20px) clamp(10px, 3vw, 16px)',
         backdropFilter: 'blur(4px)',
       }}>
       <div
@@ -60,9 +60,11 @@ export default function AboutModal({ onClose }) {
           borderRadius: 20,
           border: '1px solid var(--border)',
           boxShadow: 'var(--shadow-lg)',
-          maxWidth: 560, width: '100%',
-          maxHeight: '90vh', overflowY: 'auto',
-          padding: '36px 32px',
+          width: '100%',
+          maxWidth: 'min(560px, calc(100vw - 24px))',
+          maxHeight: 'min(90vh, 900px)', overflowY: 'auto',
+          padding: 'clamp(20px, 5vw, 36px) clamp(14px, 4vw, 32px)',
+          boxSizing: 'border-box',
         }}>
 
         {/* Header */}
@@ -143,10 +145,10 @@ export default function AboutModal({ onClose }) {
             display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap',
           }}>
             <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'monospace' }}>
-              Browser → Vercel proxy → wizyty.uml.lodz.pl
+              {t('aboutProxyFlow')}
             </span>
             <span style={{ fontSize: 11, background: 'var(--accent)', color: '#fff', borderRadius: 5, padding: '1px 7px', fontWeight: 800 }}>
-              zero storage
+              {t('aboutZeroStorage')}
             </span>
           </div>
         </div>

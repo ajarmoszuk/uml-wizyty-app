@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { useT, useLang, useDobHint, useServiceLabel } from '../i18n.jsx'
-import Icon from './Icon.jsx'
+import { useT, useLang, useDobHint, useServiceLabel } from '../../i18n'
+import Icon from '../ui/Icon.jsx'
 
 const STORAGE_KEY = 'uml_user_data'
 function loadSaved() {
@@ -66,7 +66,7 @@ export default function StepDetails({ booking, onNext, onBack }) {
   const phoneDigits = form.phone.replace(/\D/g, '')
 
   return (
-    <div className="fade-up" style={{ padding: '32px 28px' }}>
+    <div className="fade-up card-padding">
 
       {/* Booking summary */}
       <div style={{
@@ -75,9 +75,10 @@ export default function StepDetails({ booking, onNext, onBack }) {
         borderRadius: 14, padding: '14px 18px',
         marginBottom: 32,
         display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap',
+        minWidth: 0,
       }}>
         <div style={{ lineHeight: 1, color: 'var(--accent)' }} aria-hidden="true"><Icon name="calendar-check" size={28} /></div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: '1 1 200px', minWidth: 0 }}>
           <div style={{ fontSize: 12, color: 'var(--accent)', fontWeight: 700, marginBottom: 2, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('yourSlot')}</div>
           <div style={{ fontSize: 18, fontWeight: 900, color: 'var(--text)' }}>
             {formatDateLong(booking.date, lang)}, <span style={{ color: 'var(--accent)' }}>{booking.slot.time}</span>
@@ -183,12 +184,13 @@ export default function StepDetails({ booking, onNext, onBack }) {
 
         {/* Notification type */}
         <Field id="field-notif" label={t('notifLabel')}>
-          <div role="group" aria-label={t('notifLabel')} style={{ display: 'flex', gap: 8 }}>
+          <div role="group" aria-label={t('notifLabel')} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {[{ val: 'email', icon: 'mail', label: 'E-mail' }, { val: 'sms', icon: 'smartphone', label: 'SMS' }].map(opt => (
               <button key={opt.val} onClick={() => set('notificationType', opt.val)}
                 aria-pressed={form.notificationType === opt.val}
                 style={{
-                  flex: 1,
+                  flex: '1 1 140px',
+                  minWidth: 'min(100%, 140px)',
                   padding: '12px 16px',
                   border: `2px solid ${form.notificationType === opt.val ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 10,
@@ -213,10 +215,10 @@ export default function StepDetails({ booking, onNext, onBack }) {
         </label>
       </div>
 
-      <div style={{ display: 'flex', gap: 12, marginTop: 32 }}>
+      <div className="form-actions">
         <BackBtn onClick={onBack} label={t('back')} />
         <button onClick={handleSubmit} style={primaryBtn}>
-          {t('nextBtn')}
+          {t('nextBtn')} <Icon name="chevron-right" size={18} />
         </button>
       </div>
     </div>

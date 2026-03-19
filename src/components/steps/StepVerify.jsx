@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { sendVerificationCode, takeAppointment } from '../api/booking.js'
+import { sendVerificationCode, takeAppointment } from '../../api/booking.js'
 import { BackBtn, primaryBtn } from './StepDetails.jsx'
-import { useT } from '../i18n.jsx'
-import Icon from './Icon.jsx'
+import { useT } from '../../i18n'
+import Icon from '../ui/Icon.jsx'
 
 export default function StepVerify({ booking, details, onSuccess, onBack }) {
   const t = useT()
@@ -86,7 +86,7 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
   }
 
   return (
-    <div className="fade-up" style={{ padding: '32px 28px', maxWidth: 480 }}>
+    <div className="fade-up card-padding" style={{ maxWidth: 480, width: '100%', margin: '0 auto', boxSizing: 'border-box' }}>
 
       {phase === 'send' && (
         <>
@@ -136,10 +136,10 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
 
           {error && <ErrorBanner>{error}</ErrorBanner>}
 
-          <div style={{ display: 'flex', gap: 12 }}>
+          <div className="form-actions">
             <BackBtn onClick={onBack} />
             <button onClick={handleSend} disabled={loading} style={{ ...primaryBtn, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              {loading ? <><Spinner /> {t('sending')}</> : t('sendSms')}
+              {loading ? <><Spinner /> {t('sending')}</> : <>{t('sendSms')} <Icon name="chevron-right" size={18} /></>}
             </button>
           </div>
         </>
@@ -154,7 +154,7 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
             {t('codeSent', details.phone)}
           </p>
 
-          <div role="group" aria-label={t('enterCode')} style={{ display: 'flex', gap: 12, justifyContent: 'center', marginBottom: 20 }} onPaste={handlePaste}>
+          <div role="group" aria-label={t('enterCode')} className="otp-row" onPaste={handlePaste}>
             {code.map((digit, i) => (
               <input key={i} ref={inputRefs[i]}
                 aria-label={t('codeDigit', i)}
@@ -163,11 +163,10 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
                 onKeyDown={e => handleKey(i, e)}
                 maxLength={1} inputMode="numeric" autoComplete="one-time-code"
                 style={{
-                  width: 64, height: 72,
                   border: `2px solid ${digit ? 'var(--accent)' : 'var(--border)'}`,
                   borderRadius: 12,
                   background: digit ? 'var(--accent-light)' : 'var(--surface2)',
-                  fontSize: 30, fontWeight: 900, fontFamily: 'var(--font)',
+                  fontWeight: 900, fontFamily: 'var(--font)',
                   textAlign: 'center', outline: 'none',
                   color: 'var(--text)',
                   caretColor: 'var(--accent)',
@@ -195,11 +194,11 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
           )}
 
           {phase === 'code' && (
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div className="form-actions">
               <BackBtn onClick={onBack} />
               <button onClick={handleBook} disabled={loading || code.join('').length !== 4}
                 style={{ ...primaryBtn, opacity: code.join('').length !== 4 ? 0.45 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                {loading ? <><Spinner /> {t('wait')}</> : t('bookBtn')}
+                {loading ? <><Spinner /> {t('wait')}</> : <>{t('bookBtn')} <Icon name="chevron-right" size={18} /></>}
               </button>
             </div>
           )}

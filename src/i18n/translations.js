@@ -1,8 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+/** UI strings by locale + Polish category → i18n key map. */
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TRANSLATIONS
-// ─────────────────────────────────────────────────────────────────────────────
 export const T = {
   pl: {
     // meta
@@ -14,7 +11,10 @@ export const T = {
     city: 'Urząd Miasta Łodzi',
     bookTitle: 'Umów wizytę',
     about: 'O projekcie',
-    unofficial: 'Nieoficjalny interfejs · dane wysyłane wyłącznie do wizyty.uml.lodz.pl',
+    /** Herb w celach identyfikacji wizyt u urzędu — ta witryna nie jest stroną UMŁ. */
+    coaAlt: 'Herb Miasta Łodzi. Nieoficjalna strona pomagająca zarezerwować wizytę — nie jest prowadzona przez Urząd Miasta Łodzi.',
+    headerUnofficialBadge: 'Nieoficjalny system rezerwacji — nie jest stroną ani projektem Urzędu Miasta Łodzi.',
+    unofficial: 'Nieoficjalny interfejs (open source) · nie jest stroną UMŁ · dane wysyłane wyłącznie do wizyty.uml.lodz.pl',
     bannerMaintenance: 'System UML może być niedostępny — zazwyczaj przerwa techniczna trwa od 00:00 do 3:00.',
     bannerOffline: 'Brak połączenia z internetem. Sprawdź sieć i spróbuj ponownie.',
     bannerDismiss: 'Zamknij',
@@ -45,8 +45,8 @@ export const T = {
     chooseOffice: 'Wybierz oddział:',
     officeAddress: 'Adres',
     officesBadge: (n) => `${n} lok.`,
-    changeCategory: '← Zmień kategorię',
-    changeService: 'zmień ↩',
+    changeCategory: 'Zmień kategorię',
+    changeService: 'Zmień usługę',
     serviceSingular: 'usługa',
     servicePlural: 'usługi',
     serviceGenPlural: 'usług',
@@ -90,7 +90,7 @@ export const T = {
     emailError: 'Wpisz poprawny adres e-mail',
     notifLabel: 'Potwierdzenie wizyty przez',
     saveData: 'Zapamiętaj moje dane na tym urządzeniu',
-    nextBtn: 'Dalej — wyślij kod SMS →',
+    nextBtn: 'Dalej — wyślij kod SMS',
     back: '← Wróć',
 
     // consent checkboxes
@@ -102,7 +102,7 @@ export const T = {
     verifyTitle: 'Weryfikacja numeru telefonu',
     verifySub: 'Wyślemy bezpłatny SMS z 4-cyfrowym kodem na numer:',
     yourNumber: 'Twój numer',
-    sendSms: '📱 Wyślij kod SMS →',
+    sendSms: 'Wyślij kod SMS',
     sendError: 'Nie udało się wysłać SMS. Spróbuj ponownie.',
     sending: 'Wysyłanie...',
     enterCode: 'Wpisz kod z SMS',
@@ -111,7 +111,7 @@ export const T = {
     resend: 'Wyślij kod ponownie',
     codeError: 'Wpisz 4-cyfrowy kod z SMS',
     bookingInProgress: 'Rezerwuję wizytę...',
-    bookBtn: '✅ Zarezerwuj wizytę →',
+    bookBtn: 'Zarezerwuj wizytę',
     bookError: 'Rezerwacja nie powiodła się: ',
     wait: 'Chwilę...',
 
@@ -144,9 +144,12 @@ export const T = {
     aboutBody: `Oryginalna platforma (wizyty.uml.lodz.pl) jest, delikatnie mówiąc, trudna w użyciu. Odpowiedzi API zawierają kilkanaście kilobajtów wewnętrznych notatek developerskich, polskie nazwy pól w JSON, działania arytmetyczne jako stringi i praktycznie zerową strukturę. Frontend jest wolny, nieintuicyjny i utrudnia nawet najprostszą rezerwację.
 
 Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serwerami uml.lodz.pl, ale prezentuje informacje tak, jakby napisał go człowiek. Nic tutaj nie jest zbierane ani przechowywane. Twoje dane trafiają wyłącznie do serwera urzędu.`,
-    claudeNote: 'Zbudowane z pomocą Claude w ~3 godziny i ~20$ na tokeny. Tyle zajęło AI zrobienie czegoś, co UML zlecił ludziom.',
-    aboutDataNote: '🔒 Twoje dane są przesyłane przez proxy Vercel bezpośrednio na serwery wizyty.uml.lodz.pl — bez żadnych pośredników. Ten serwis nie zbiera, nie przechowuje ani nie przetwarza żadnych danych osobowych. Kod źródłowy jest publicznie dostępny do weryfikacji.',
-    proxyNote: 'Dane → proxy Vercel → wizyty.uml.lodz.pl · zero przechowywania',
+    claudeNote: 'Dla kontekstu: większość powstała z pomocą Claude w ok. 3 godziny, za ~20 USD na tokeny API. To raczej ciekawostka o skali takiego „weekendowego” eksperymentu — bez oceniania czyichkolwiek przetargów czy zespołów.',
+    aboutDataNote: 'Z powodu CORS przeglądarka nie wysyła z tej witryny żądań wprost na inną domenę (wizyty.uml.lodz.pl). W pliku vercel.json jest reguła rewrite: ruch idzie przez infrastrukturę Vercel i jest przekazywany na te same urzędowe serwery. To techniczne proxy na granicy domen — nie „pośrednik” zbierający czy odsprzedający dane. Ten serwis nie zbiera, nie przechowuje ani nie przetwarza danych osobowych. Kod źródłowy jest publicznie dostępny do weryfikacji.',
+    aboutProxyFlow: 'Przeglądarka → rewrite Vercel (vercel.json, /api/*) → wizyty.uml.lodz.pl',
+    aboutZeroStorage: 'brak zapisu po stronie aplikacji',
+    proxyNote: 'CORS: rewrite w vercel.json (Vercel /api/*) → wizyty.uml.lodz.pl · nic nie zapisujemy',
+    footerBuildHint: 'Więcej o powstaniu (Claude, ok. 3 h, ~20 USD) —',
     bannerConnectionReset: 'Błąd połączenia z serwerem UML (PR_CONNECT_RESET / ERR_CONNECTION_RESET) — serwer prawdopodobnie jest w trybie konserwacji. Zazwyczaj trwa to od 00:00 do 3:00.',
     hireMe: 'Jesteś z Łódzkiego Urzędu?',
     hireMeSub: 'Skontaktuj się ze mną lub zatrudnij mnie —',
@@ -162,7 +165,9 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     city: 'City of Łódź',
     bookTitle: 'Book an appointment',
     about: 'About',
-    unofficial: 'Unofficial interface · data sent only to wizyty.uml.lodz.pl',
+    coaAlt: 'Coat of arms of the City of Łódź. Unofficial booking helper — not operated by Łódź City Office.',
+    headerUnofficialBadge: 'Unofficial booking tool — not affiliated with or run by Łódź City Office.',
+    unofficial: 'Unofficial open-source interface · not the city office’s website · data sent only to wizyty.uml.lodz.pl',
     bannerMaintenance: 'The UML system may be unavailable — scheduled maintenance usually runs 00:00–3:00.',
     bannerOffline: 'No internet connection. Check your network and try again.',
     bannerDismiss: 'Dismiss',
@@ -191,8 +196,8 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     chooseOffice: 'Choose office:',
     officeAddress: 'Address',
     officesBadge: (n) => `${n} loc.`,
-    changeCategory: '← Change category',
-    changeService: 'change ↩',
+    changeCategory: 'Change category',
+    changeService: 'Change service',
     serviceSingular: 'service',
     servicePlural: 'services',
     serviceGenPlural: 'services',
@@ -234,7 +239,7 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     emailError: 'Enter a valid email address',
     notifLabel: 'Appointment confirmation via',
     saveData: 'Remember my details on this device',
-    nextBtn: 'Next — send SMS code →',
+    nextBtn: 'Next — send SMS code',
     back: '← Back',
 
     // consent checkboxes
@@ -245,7 +250,7 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     verifyTitle: 'Phone number verification',
     verifySub: 'We\'ll send a free SMS with a 4-digit code to:',
     yourNumber: 'Your number',
-    sendSms: '📱 Send SMS code →',
+    sendSms: 'Send SMS code',
     sendError: 'Failed to send SMS. Please try again.',
     sending: 'Sending...',
     enterCode: 'Enter SMS code',
@@ -254,7 +259,7 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     resend: 'Resend code',
     codeError: 'Enter the 4-digit code from the SMS',
     bookingInProgress: 'Booking your appointment...',
-    bookBtn: '✅ Book appointment →',
+    bookBtn: 'Book appointment',
     bookError: 'Booking failed: ',
     wait: 'Please wait...',
 
@@ -286,9 +291,12 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
 The API returns 15KB of internal developer debug notes per request. Field names are Polish strings embedded in JSON. Arithmetic calculations appear as string values like "5 - 5 = 0, CZYLI WYTWORZYŁ 0 DŁUGU". There is no versioning, no documentation, no structure. The frontend is slow, counter-intuitive, and appears to have never been reviewed by anyone with UX experience.
 
 This project is an unofficial, open-source wrapper that talks to the same city servers but presents the information like a human being wrote it.`,
-    claudeNote: 'Built with Claude in ~3 hours and ~$20 in tokens. That\'s how long it took an AI to do what Łódź City Hall commissioned from humans.',
-    aboutDataNote: '🔒 Your data is proxied via Vercel directly to wizyty.uml.lodz.pl — no middlemen. This service does not collect, store or process any personal data. The source code is publicly available for verification.',
-    proxyNote: 'Data → Vercel proxy → wizyty.uml.lodz.pl · zero storage',
+    claudeNote: 'For context: most of this was built with Claude in about 3 hours, for roughly $20 in API tokens. I mean it as a fun data point about how fast a side project can come together — not as a dig at anyone\'s procurement or in-house teams.',
+    aboutDataNote: 'Because of CORS, the browser won’t call the city booking API on another domain directly from this site. The vercel.json rewrite sends traffic through Vercel’s edge to the same official wizyty.uml.lodz.pl servers. That’s a technical same-origin workaround — not a data broker or extra party processing your visit. This service does not collect, store, or process personal data. The source code is public for verification.',
+    aboutProxyFlow: 'Browser → Vercel rewrite (vercel.json, /api/*) → wizyty.uml.lodz.pl',
+    aboutZeroStorage: 'no app-side storage',
+    proxyNote: 'CORS: vercel.json rewrite (Vercel /api/*) → wizyty.uml.lodz.pl · we store nothing',
+    footerBuildHint: 'More on how this was built (Claude, ~3h, ~$20) —',
     bannerConnectionReset: 'Connection reset by the UML server (PR_CONNECT_RESET / ERR_CONNECTION_RESET) — the backend is likely in maintenance mode. This usually happens between 00:00–3:00.',
     hireMe: 'From Łódź City Office?',
     hireMeSub: 'Get in touch or hire me —',
@@ -306,7 +314,9 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     city: 'Міська рада Лодзі',
     bookTitle: 'Записатися на прийом',
     about: 'Про проект',
-    unofficial: 'Неофіційний інтерфейс · дані надсилаються лише на wizyty.uml.lodz.pl',
+    coaAlt: 'Герб міста Лодзь. Неофіційна сторінка для запису на прийом — не ведеться Міською радою Лодзі.',
+    headerUnofficialBadge: 'Неофіційна система запису — не є сайтом і не проектом Міської ради Лодзі.',
+    unofficial: 'Неофіційний інтерфейс (open source) · не сайт міської ради · дані лише на wizyty.uml.lodz.pl',
     bannerMaintenance: 'Система UML може бути недоступна — технічна перерва зазвичай з 00:00 до 3:00.',
     bannerOffline: 'Немає підключення до інтернету. Перевірте мережу і спробуйте ще раз.',
     bannerDismiss: 'Закрити',
@@ -335,8 +345,8 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     chooseOffice: 'Оберіть відділення:',
     officeAddress: 'Адреса',
     officesBadge: (n) => `${n} місць`,
-    changeCategory: '← Змінити категорію',
-    changeService: 'змінити ↩',
+    changeCategory: 'Змінити категорію',
+    changeService: 'Змінити послугу',
     serviceSingular: 'послуга',
     servicePlural: 'послуги',
     serviceGenPlural: 'послуг',
@@ -378,7 +388,7 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     emailError: 'Введіть дійсну адресу ел. пошти',
     notifLabel: 'Підтвердження запису через',
     saveData: 'Запам\'ятати мої дані на цьому пристрої',
-    nextBtn: 'Далі — надіслати SMS-код →',
+    nextBtn: 'Далі — надіслати SMS-код',
     back: '← Назад',
 
     // consent checkboxes
@@ -389,7 +399,7 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     verifyTitle: 'Верифікація номера телефону',
     verifySub: 'Надішлемо безкоштовний SMS з 4-значним кодом на номер:',
     yourNumber: 'Ваш номер',
-    sendSms: '📱 Надіслати SMS-код →',
+    sendSms: 'Надіслати SMS-код',
     sendError: 'Не вдалося надіслати SMS. Спробуйте ще раз.',
     sending: 'Надсилання...',
     enterCode: 'Введіть код з SMS',
@@ -398,7 +408,7 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     resend: 'Надіслати код знову',
     codeError: 'Введіть 4-значний код з SMS',
     bookingInProgress: 'Резервуємо запис...',
-    bookBtn: '✅ Підтвердити запис →',
+    bookBtn: 'Підтвердити запис',
     bookError: 'Помилка бронювання: ',
     wait: 'Зачекайте...',
 
@@ -430,9 +440,12 @@ This project is an unofficial, open-source wrapper that talks to the same city s
 API-відповіді містять 15 кілобайт внутрішніх розробницьких нотаток на кожен запит. Назви JSON-полів — польські рядки. Арифметичні обчислення вбудовані як рядки на зразок "5 - 5 = 0, CZYLI WYTWORZYŁ 0 DŁUGU". Жодного версіонування, жодної документації, жодної структури. Фронтенд повільний і незручний.
 
 Цей проект — неофіційна обгортка з відкритим вихідним кодом, яка звертається до тих самих міських серверів, але представляє інформацію так, ніби її написала людина.`,
-    claudeNote: 'Створено за допомогою Claude за ~3 години і ~$20 на токени. Стільки знадобилось ШІ, щоб зробити те, що Міська рада Лодзі замовила у людей.',
-    aboutDataNote: '🔒 Ваші дані передаються через проксі Vercel напряму на сервери wizyty.uml.lodz.pl — без посередників. Цей сервіс не збирає, не зберігає та не обробляє жодних персональних даних. Вихідний код є публічно доступним для перевірки.',
-    proxyNote: 'Дані → проксі Vercel → wizyty.uml.lodz.pl · без збереження',
+    claudeNote: 'Для контексту: більшість зібрано з Claude за ~3 години та ~$20 на токени API. Це радше цікава деталь про те, як швидко може з\'явитися такий побічний проєкт — без натяку на чиїсь тендери чи штатні команди.',
+    aboutDataNote: 'Через CORS браузер не надсилає запити з цього сайту безпосередньо на інший домен (wizyty.uml.lodz.pl). У vercel.json налаштовано rewrite: трафік проходить через інфраструктуру Vercel і передається на ті самі офіційні сервери. Це технічне проксі на межі доменів — не посередник, який збирає чи перепродає дані. Сервіс не збирає, не зберігає та не обробляє персональні дані. Вихідний код відкритий для перевірки.',
+    aboutProxyFlow: 'Браузер → rewrite Vercel (vercel.json, /api/*) → wizyty.uml.lodz.pl',
+    aboutZeroStorage: 'немає збереження на стороні застосунку',
+    proxyNote: 'CORS: rewrite у vercel.json (Vercel /api/*) → wizyty.uml.lodz.pl · нічого не зберігаємо',
+    footerBuildHint: 'Більше про створення (Claude, ~3 год, ~$20) —',
     bannerConnectionReset: 'З\'єднання скинуто сервером UML (PR_CONNECT_RESET / ERR_CONNECTION_RESET) — сервер, ймовірно, на технічному обслуговуванні. Зазвичай це відбувається з 00:00 до 3:00.',
     hireMe: 'Ви з Міської ради Лодзі?',
     hireMeSub: "Зв'яжіться зі мною або найміть мене —",
@@ -455,104 +468,4 @@ export const CAT_KEY = {
   'Osoby z niepełnosprawnością':     'cat_Niepelnosprawni',
   'Egzekucja i windykacja':          'cat_Egzekucja',
   'Działalność gospodarcza':         'cat_Dzialalnosc',
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// CONTEXTS
-// ─────────────────────────────────────────────────────────────────────────────
-export const LangContext = createContext({ lang: 'pl', setLang: () => {} })
-export const ThemeContext = createContext({ dark: false, setDark: () => {} })
-
-export function LangProvider({ children }) {
-  const [lang, setLangState] = useState(() => localStorage.getItem('uml_lang') || 'pl')
-
-  useEffect(() => {
-    document.documentElement.lang = lang
-  }, [lang])
-
-  function setLang(l) {
-    setLangState(l)
-    localStorage.setItem('uml_lang', l)
-  }
-  return <LangContext.Provider value={{ lang, setLang }}>{children}</LangContext.Provider>
-}
-
-export function ThemeProvider({ children }) {
-  const [dark, setDarkState] = useState(() => {
-    const saved = localStorage.getItem('uml_theme')
-    if (saved) return saved === 'dark'
-    return window.matchMedia('(prefers-color-scheme: dark)').matches
-  })
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light')
-    localStorage.setItem('uml_theme', dark ? 'dark' : 'light')
-  }, [dark])
-
-  function setDark(v) { setDarkState(v) }
-  return <ThemeContext.Provider value={{ dark, setDark }}>{children}</ThemeContext.Provider>
-}
-
-export function useLang() { return useContext(LangContext) }
-export function useTheme() { return useContext(ThemeContext) }
-
-// t(key) — returns translated string for current language
-export function useT() {
-  const { lang } = useLang()
-  const strings = T[lang] || T.pl
-  return (key, ...args) => {
-    const val = strings[key] ?? T.pl[key] ?? key
-    return typeof val === 'function' ? val(...args) : val
-  }
-}
-
-// serviceLabel(svc) — returns the label for a service in the current language
-export function useServiceLabel() {
-  const { lang } = useLang()
-  return (svc) => {
-    if (!svc) return ''
-    if (lang === 'en' && svc.labelEn) return svc.labelEn
-    if (lang === 'uk' && svc.labelUk) return svc.labelUk
-    return svc.label
-  }
-}
-
-// dobHint(svc) — returns the date-of-birth hint for a service in the current language
-export function useDobHint() {
-  const { lang } = useLang()
-  return (svc) => {
-    if (!svc?.dobHint) return null
-    if (lang === 'en') return svc.dobHint.en ?? svc.dobHint.pl
-    if (lang === 'uk') return svc.dobHint.uk ?? svc.dobHint.pl
-    return svc.dobHint.pl
-  }
-}
-
-// officeLabel(svc) — returns the district/branch name for a service in the current language
-export function useOfficeLabel() {
-  const { lang } = useLang()
-  return (svc) => {
-    if (!svc) return ''
-    if (lang === 'en' && svc.officeLabelEn) return svc.officeLabelEn
-    if (lang === 'uk' && svc.officeLabelUk) return svc.officeLabelUk
-    return svc.officeLabel || ''
-  }
-}
-
-// pluralService(n) — correct noun form for service count per language
-// PL/UK: 1 → singular, 2-4 (not 12-14) → plural, else → genitive plural
-// EN: 1 → singular, else → plural
-export function usePluralService() {
-  const { lang } = useLang()
-  const t = useT()
-  return (n) => {
-    if (lang === 'pl' || lang === 'uk') {
-      const mod10  = n % 10
-      const mod100 = n % 100
-      if (n === 1) return t('serviceSingular')
-      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return t('servicePlural')
-      return t('serviceGenPlural')
-    }
-    return n === 1 ? t('serviceSingular') : t('servicePlural')
-  }
 }
