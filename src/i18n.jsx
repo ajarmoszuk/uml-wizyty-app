@@ -31,6 +31,9 @@ export const T = {
     whatNeeded: 'Czego potrzebujesz?',
     chooseCategory: 'Wybierz kategorię, żeby zobaczyć usługi:',
     chooseService: 'Wybierz usługę:',
+    chooseOffice: 'Wybierz oddział:',
+    officeAddress: 'Adres',
+    officesBadge: (n) => `${n} lok.`,
     changeCategory: '← Zmień kategorię',
     changeService: 'zmień ↩',
     serviceSingular: 'usługa',
@@ -161,6 +164,9 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     whatNeeded: 'What do you need?',
     chooseCategory: 'Choose a category to see available services:',
     chooseService: 'Choose a service:',
+    chooseOffice: 'Choose office:',
+    officeAddress: 'Address',
+    officesBadge: (n) => `${n} loc.`,
     changeCategory: '← Change category',
     changeService: 'change ↩',
     serviceSingular: 'service',
@@ -289,6 +295,9 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     whatNeeded: 'Що вам потрібно?',
     chooseCategory: 'Оберіть категорію, щоб побачити послуги:',
     chooseService: 'Оберіть послугу:',
+    chooseOffice: 'Оберіть відділення:',
+    officeAddress: 'Адреса',
+    officesBadge: (n) => `${n} місць`,
     changeCategory: '← Змінити категорію',
     changeService: 'змінити ↩',
     serviceSingular: 'послуга',
@@ -477,6 +486,17 @@ export function useDobHint() {
     if (lang === 'en') return svc.dobHint.en ?? svc.dobHint.pl
     if (lang === 'uk') return svc.dobHint.uk ?? svc.dobHint.pl
     return svc.dobHint.pl
+  }
+}
+
+// officeLabel(svc) — returns the district/branch name for a service in the current language
+export function useOfficeLabel() {
+  const { lang } = useLang()
+  return (svc) => {
+    if (!svc) return ''
+    if (lang === 'en' && svc.officeLabelEn) return svc.officeLabelEn
+    if (lang === 'uk' && svc.officeLabelUk) return svc.officeLabelUk
+    return svc.officeLabel || ''
   }
 }
 

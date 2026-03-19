@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { fetchRangeAvailability, fetchSlots, SERVICES, CATEGORY_META } from '../api/booking.js'
-import { useT, usePluralService, useServiceLabel, CAT_KEY } from '../i18n.jsx'
+import { useT, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../i18n.jsx'
 
 function toDateStr(d) {
   const y = d.getFullYear()
@@ -71,11 +71,13 @@ export default function StepSlots({ onSelect }) {
   const t = useT()
   const pluralService = usePluralService()
   const svcLabel = useServiceLabel()
+  const officeLabel = useOfficeLabel()
   const today = new Date(); today.setHours(0,0,0,0)
 
   const [viewMode, setViewMode] = useState(() => localStorage.getItem('uml_view') || 'grid')
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [selectedService, setSelectedService] = useState(null)
+  const [pendingGroupServices, setPendingGroupServices] = useState(null) // office-picker state
 
   const [viewMonth, setViewMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
   const [availability, setAvailability] = useState({})
@@ -124,13 +126,105 @@ export default function StepSlots({ onSelect }) {
     setSelectedDate(null)
     setSlots([])
     setAvailability({})
+    setPendingGroupServices(null)
+  }
+
+  function handleServiceCardClick(svc) {
+    if (svc.serviceGroup) {
+      const offices = SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup)
+      if (offices.length > 1) {
+        setPendingGroupServices(offices)
+        return
+      }
+    }
+    handleServiceSelect(svc)
+  }
+
+  // ── OFFICE PICKER ───────────────────────────────────────────────────────
+  if (!selectedService && pendingGroupServices) {
+    const groupMeta = CATEGORY_META[pendingGroupServices[0].category] || { icon: '📋', color: '#2563eb' }
+    return (
+      <div className="fade-up" style={{ padding: '32px 28px' }}>
+        <button onClick={() => setPendingGroupServices(null)} style={{
+          background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 20px',
+          fontSize: 13, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font)',
+          display: 'flex', alignItems: 'center', gap: 4,
+        }}>
+          ← {t('changeService')}
+        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+          <span style={{ fontSize: 26 }} aria-hidden="true">{pendingGroupServices[0].icon}</span>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
+            {svcLabel(pendingGroupServices[0])}
+          </h2>
+        </div>
+        <p style={{ fontSize: 15, color: 'var(--text-2)', marginBottom: 24, lineHeight: 1.5 }}>
+          {t('chooseOffice')}
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {pendingGroupServices.map((svc, i) => (
+            <button key={i}
+              onClick={() => { handleServiceSelect(svc); setPendingGroupServices(null) }}
+              style={{
+                padding: '18px 20px',
+                background: 'var(--surface)',
+                border: `1.5px solid var(--border)`,
+                borderLeft: `4px solid ${groupMeta.color}`,
+                borderRadius: 14,
+                cursor: 'pointer',
+                textAlign: 'left',
+                fontFamily: 'var(--font)',
+                display: 'flex', alignItems: 'center', gap: 16,
+                transition: 'all var(--transition)',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = `${groupMeta.color}0d`
+                e.currentTarget.style.borderColor = `${groupMeta.color}80`
+                e.currentTarget.style.borderLeftColor = groupMeta.color
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'var(--surface)'
+                e.currentTarget.style.borderColor = 'var(--border)'
+                e.currentTarget.style.borderLeftColor = groupMeta.color
+              }}
+              aria-label={`${officeLabel(svc)}, ${svc.address}`}
+            >
+              <span style={{ fontSize: 28, flexShrink: 0 }} aria-hidden="true">📍</span>
+              <span>
+                <span style={{ display: 'block', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>
+                  {officeLabel(svc)}
+                </span>
+                <span style={{ display: 'block', fontSize: 13, color: 'var(--text-2)', fontWeight: 500, marginTop: 3 }}>
+                  {svc.address}
+                </span>
+              </span>
+              <span style={{ fontSize: 22, color: 'var(--text-3)', marginLeft: 'auto', flexShrink: 0 }} aria-hidden="true">›</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   // ── SERVICE PICKER ──────────────────────────────────────────────────────
   if (!selectedService) {
-    const servicesInCategory = selectedCategory
-      ? SERVICES.filter(s => s.category === selectedCategory)
+    // Deduplicate services by serviceGroup — show one card per logical service type
+    const uniqueServicesInCategory = selectedCategory
+      ? (() => {
+          const seen = new Set()
+          return SERVICES
+            .filter(s => s.category === selectedCategory)
+            .filter(s => {
+              const key = s.serviceGroup || s.serviceId
+              if (seen.has(key)) return false
+              seen.add(key)
+              return true
+            })
+        })()
       : []
+    const servicesInCategory = uniqueServicesInCategory
     const selectedCatMeta = selectedCategory ? CATEGORY_META[selectedCategory] : null
     const selectedCatLabel = selectedCategory ? t(CAT_KEY[selectedCategory] || 'cat_Pojazdy') : null
     const isGrid = viewMode === 'grid'
@@ -155,7 +249,13 @@ export default function StepSlots({ onSelect }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
               {CATEGORIES.map(cat => {
                 const meta = CATEGORY_META[cat] || { icon: '📋', color: '#374151' }
-                const count = SERVICES.filter(s => s.category === cat).length
+                const seen = new Set()
+                const count = SERVICES.filter(s => s.category === cat).filter(s => {
+                  const key = s.serviceGroup || s.serviceId
+                  if (seen.has(key)) return false
+                  seen.add(key)
+                  return true
+                }).length
                 const catLabel = t(CAT_KEY[cat] || cat)
                 return (
                   <button key={cat} onClick={() => setSelectedCategory(cat)} style={{
@@ -201,7 +301,13 @@ export default function StepSlots({ onSelect }) {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {CATEGORIES.map(cat => {
                 const meta = CATEGORY_META[cat] || { icon: '📋', color: '#374151' }
-                const count = SERVICES.filter(s => s.category === cat).length
+                const seenL = new Set()
+                const count = SERVICES.filter(s => s.category === cat).filter(s => {
+                  const key = s.serviceGroup || s.serviceId
+                  if (seenL.has(key)) return false
+                  seenL.add(key)
+                  return true
+                }).length
                 const catLabel = t(CAT_KEY[cat] || cat)
                 return (
                   <button key={cat} onClick={() => setSelectedCategory(cat)} style={{
@@ -256,8 +362,10 @@ export default function StepSlots({ onSelect }) {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
                 {servicesInCategory.map((svc, i) => {
                   const meta = selectedCatMeta || { color: '#2563eb' }
+                  const hasMultipleOffices = svc.serviceGroup &&
+                    SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup).length > 1
                   return (
-                    <button key={i} onClick={() => handleServiceSelect(svc)} style={{
+                    <button key={i} onClick={() => handleServiceCardClick(svc)} style={{
                       padding: '18px 14px 16px',
                       background: 'var(--surface)',
                       border: `1.5px solid var(--border)`,
@@ -288,6 +396,14 @@ export default function StepSlots({ onSelect }) {
                     }}>
                       <span style={{ fontSize: 30, lineHeight: 1 }} aria-hidden="true">{svc.icon}</span>
                       <span style={{ fontSize: 14, fontWeight: 700, lineHeight: 1.35 }}>{svcLabel(svc)}</span>
+                      {hasMultipleOffices && (() => {
+                        const cnt = SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup).length
+                        return (
+                          <span style={{ fontSize: 11, color: meta.color, fontWeight: 700, background: `${meta.color}18`, borderRadius: 6, padding: '2px 7px' }}>
+                            📍 {t('officesBadge', cnt)}
+                          </span>
+                        )
+                      })()}
                     </button>
                   )
                 })}
@@ -297,8 +413,11 @@ export default function StepSlots({ onSelect }) {
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {servicesInCategory.map((svc, i) => {
                   const meta = selectedCatMeta || { color: '#2563eb' }
+                  const officeCount = svc.serviceGroup
+                    ? SERVICES.filter(s => s.category === selectedCategory && s.serviceGroup === svc.serviceGroup).length
+                    : 0
                   return (
-                    <button key={i} onClick={() => handleServiceSelect(svc)} style={{
+                    <button key={i} onClick={() => handleServiceCardClick(svc)} style={{
                       padding: '15px 18px',
                       background: 'var(--surface)',
                       border: '1.5px solid var(--border)',
@@ -325,7 +444,14 @@ export default function StepSlots({ onSelect }) {
                       e.currentTarget.style.background = 'var(--surface)'
                     }}>
                       <span style={{ fontSize: 22, flexShrink: 0 }} aria-hidden="true">{svc.icon}</span>
-                      <span style={{ flex: 1 }}>{svcLabel(svc)}</span>
+                      <span style={{ flex: 1 }}>
+                        {svcLabel(svc)}
+                        {officeCount > 1 && (
+                          <span style={{ display: 'block', fontSize: 12, color: 'var(--text-2)', fontWeight: 600, marginTop: 2 }}>
+                            📍 {t('officesBadge', officeCount)}
+                          </span>
+                        )}
+                      </span>
                       <span style={{ fontSize: 22, color: 'var(--text-3)', flexShrink: 0 }} aria-hidden="true">›</span>
                     </button>
                   )
@@ -363,7 +489,18 @@ export default function StepSlots({ onSelect }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ fontSize: 18 }} aria-hidden="true">{selectedService.icon}</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{svcLabel(selectedService)}</span>
+            <div>
+              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>{svcLabel(selectedService)}</span>
+              {selectedService.address && (
+                <div style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 2, display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span aria-hidden="true">📍</span>
+                  {selectedService.officeLabel && (
+                    <span style={{ fontWeight: 700 }}>{officeLabel(selectedService)} · </span>
+                  )}
+                  {selectedService.address}
+                </div>
+              )}
+            </div>
           </div>
         </div>
         <button onClick={handleChangeService} style={{
