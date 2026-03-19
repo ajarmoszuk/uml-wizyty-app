@@ -91,8 +91,8 @@ export default function App() {
           <div style={{ display: 'inline-block', marginBottom: 10, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.22))' }}>
             <LodzCOA size={44} />
           </div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
-            &lsquo;{t('city')}&rsquo;
+          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-3)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 8 }}>
+            {t('city')}
           </div>
           <h1 style={{ fontSize: 30, fontWeight: 900, color: 'var(--text)', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
             {t('bookTitle')}

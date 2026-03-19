@@ -300,7 +300,7 @@ export default function StepSlots({ onSelect }) {
           <>
           {isGrid ? (
             // ── CATEGORY GRID ─────────────────────────────────────────────
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
               {CATEGORIES.map(cat => {
                 const meta = CATEGORY_META[cat] || { icon: '📋', color: '#374151' }
                 const seen = new Set()
@@ -313,7 +313,7 @@ export default function StepSlots({ onSelect }) {
                 const catLabel = t(CAT_KEY[cat] || cat)
                 return (
                   <button key={cat} onClick={() => setSelectedCategory(cat)} style={{
-                    padding: '22px 14px 18px',
+                    padding: '16px 10px 14px',
                     background: 'var(--surface)',
                     border: `1.5px solid var(--border)`,
                     borderTop: `4px solid ${meta.color}`,
@@ -321,9 +321,9 @@ export default function StepSlots({ onSelect }) {
                     cursor: 'pointer',
                     textAlign: 'center',
                     fontFamily: 'var(--font)',
-                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8,
                     transition: 'all var(--transition)',
-                    minHeight: 140,
+                    minHeight: 110,
                   }}
                   onMouseEnter={e => {
                     e.currentTarget.style.background = `${meta.color}0d`
@@ -339,10 +339,10 @@ export default function StepSlots({ onSelect }) {
                     e.currentTarget.style.transform = 'none'
                     e.currentTarget.style.boxShadow = 'none'
                   }}>
-                    <span style={{ fontSize: 42, lineHeight: 1 }} aria-hidden="true">{meta.icon}</span>
+                    <span style={{ fontSize: 36, lineHeight: 1 }} aria-hidden="true">{meta.icon}</span>
                     <span>
-                      <span style={{ display: 'block', fontSize: 18, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
-                      <span style={{ display: 'block', fontSize: 14, color: 'var(--text-2)', fontWeight: 600, marginTop: 3 }}>
+                      <span style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontSize: 16, fontWeight: 800, color: 'var(--text)', lineHeight: 1.3 }}>{catLabel}</span>
+                      <span style={{ display: 'block', fontSize: 13, color: 'var(--text-2)', fontWeight: 600, marginTop: 3 }}>
                         {count} {pluralService(count)}
                       </span>
                     </span>
