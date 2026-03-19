@@ -23,7 +23,9 @@ export const T = {
     step0: 'Termin',
     step1: 'Dane',
     step2: 'SMS',
+    stepConfirmTitle: 'Potwierdzenie',
     stepCount: (n, total) => `Krok ${n} z ${total}`,
+    skipToMain: 'Przejdź do treści',
 
     // service picker
     whatNeeded: 'Czego potrzebujesz?',
@@ -152,7 +154,9 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     step0: 'Date',
     step1: 'Details',
     step2: 'SMS',
+    stepConfirmTitle: 'Confirmation',
     stepCount: (n, total) => `Step ${n} of ${total}`,
+    skipToMain: 'Skip to main content',
 
     whatNeeded: 'What do you need?',
     chooseCategory: 'Choose a category to see available services:',
@@ -278,7 +282,9 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     step0: 'Час',
     step1: 'Дані',
     step2: 'SMS',
+    stepConfirmTitle: 'Підтвердження',
     stepCount: (n, total) => `Крок ${n} з ${total}`,
+    skipToMain: 'Перейти до вмісту',
 
     whatNeeded: 'Що вам потрібно?',
     chooseCategory: 'Оберіть категорію, щоб побачити послуги:',

@@ -12,7 +12,7 @@
   --accent-hover: #1d4ed8;
   --text: #1a1714;
   --text-2: #6b6560;
-  --text-3: #a8a29e;
+  --text-3: #756f6a; /* was #a8a29e (2.8:1) — bumped to ~4.6:1 on white */
   --green: #16a34a;
   --green-light: #f0fdf4;
   --red: #dc2626;
@@ -119,5 +119,52 @@ a:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Skip navigation link — invisible until focused by keyboard */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 10px 18px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  font-size: 15px;
+  border-radius: 0 0 10px 10px;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* High contrast mode (Windows High Contrast, macOS Increase Contrast) */
+@media (prefers-contrast: more) {
+  :root, [data-theme="light"] {
+    --text-2: #2a2520;
+    --text-3: #3d3830;
+    --border: #6b6560;
+    --border-dark: #3d3830;
+  }
+  [data-theme="dark"] {
+    --text-2: #d8e0f0;
+    --text-3: #b0bdd8;
+    --border: #6070a0;
+    --border-dark: #8090c0;
+  }
+}
+
+/* Windows Forced Colors (High Contrast Mode) */
+@media (forced-colors: active) {
+  button, a, input, select {
+    forced-color-adjust: none;
+    border: 1px solid ButtonText;
+  }
+  .skip-link {
+    background: Highlight;
+    color: HighlightText;
   }
 }

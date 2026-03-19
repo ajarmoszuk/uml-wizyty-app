@@ -42,6 +42,8 @@ export default function App() {
 
   useEffect(() => {
     cardRef.current?.focus()
+    const stepTitles = [t('step0'), t('step1'), t('step2'), t('stepConfirmTitle')]
+    document.title = `${stepTitles[step] || t('bookTitle')} — UML Wizyty`
   }, [step])
   const [booking, setBooking] = useState(null)
   const [details, setDetails] = useState(null)
@@ -59,6 +61,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', padding: '24px 16px 64px' }}>
+      <a href="#main-content" className="skip-link">{t('skipToMain')}</a>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
         <TopBar />
@@ -137,7 +140,7 @@ export default function App() {
         )}
 
         {/* Main card */}
-        <div ref={cardRef} tabIndex={-1} style={{
+        <div id="main-content" ref={cardRef} tabIndex={-1} style={{
           background: 'var(--surface)',
           borderRadius: 20,
           boxShadow: 'var(--shadow-lg)',
