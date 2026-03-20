@@ -6,21 +6,27 @@ import StepConfirm from './components/steps/StepConfirm.jsx'
 import TopBar from './components/layout/TopBar.jsx'
 import LodzCOA from './components/layout/LodzCOA.jsx'
 import SystemBanner from './components/layout/SystemBanner.jsx'
-import { useT } from './i18n'
+import { useT, useLang, T } from './i18n'
 import { useSystemBanners } from './hooks/useSystemBanners.js'
 import Icon from './components/ui/Icon.jsx'
 
 export default function App() {
   const t = useT()
+  const { lang } = useLang()
   const [step, setStep] = useState(0)
   const cardRef = useRef(null)
   const banners = useSystemBanners()
 
+  // Focus main card only when *step* changes — not on language change (avoids mobile scroll jump).
   useEffect(() => {
-    cardRef.current?.focus()
-    const stepTitles = [t('step0'), t('step1'), t('step2'), t('stepConfirmTitle')]
-    document.title = `${stepTitles[step] || t('bookTitle')} — ${t('appBrandName')}`
-  }, [step, t])
+    cardRef.current?.focus({ preventScroll: true })
+  }, [step])
+
+  useEffect(() => {
+    const strings = T[lang] || T.pl
+    const stepTitles = [strings.step0, strings.step1, strings.step2, strings.stepConfirmTitle]
+    document.title = `${stepTitles[step] || strings.bookTitle} — ${strings.appBrandName}`
+  }, [step, lang])
   const [booking, setBooking] = useState(null)
   const [details, setDetails] = useState(null)
   const [ticket, setTicket] = useState(null)

@@ -10,6 +10,7 @@ import {
 import { useT, useLang, usePluralService, useServiceLabel, useOfficeLabel, CAT_KEY } from '../../i18n'
 import { googleMapsUrl } from '../../utils/googleMaps.js'
 import Icon from '../ui/Icon.jsx'
+import { BackBtn } from './StepDetails.jsx'
 
 function toDateStr(d) {
   const y = d.getFullYear()
@@ -354,14 +355,6 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
     const groupMeta = CATEGORY_META[pendingGroupServices[0].category] || { icon: 'clipboard-list', color: '#2563eb' }
     return (
       <div className="fade-up card-padding">
-        <button onClick={() => setPendingGroupServices(null)} style={{
-          background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 20px',
-          fontSize: 13, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font)',
-          display: 'flex', alignItems: 'center', gap: 4,
-        }}>
-          <Icon name="chevron-left" size={16} /> {t('changeService')}
-        </button>
-
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
           <Icon name={serviceDisplayIcon(pendingGroupServices[0])} size={26} strokeWidth={2.25} style={{ color: groupMeta.color, flexShrink: 0 }} />
           <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text)', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
@@ -449,6 +442,9 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
               </div>
             </div>
           ))}
+        </div>
+        <div className="form-actions form-actions--single">
+          <BackBtn onClick={() => setPendingGroupServices(null)} label={t('changeService')} />
         </div>
       </div>
     )
@@ -561,15 +557,6 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
           </>
         ) : (
           <>
-            {/* Back to categories */}
-            <button onClick={() => setSelectedCategory(null)} style={{
-              background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 16px',
-              fontSize: 13, fontWeight: 700, color: 'var(--accent)', fontFamily: 'var(--font)',
-              display: 'flex', alignItems: 'center', gap: 4,
-            }}>
-              <Icon name="chevron-left" size={16} /> {t('changeCategory')}
-            </button>
-
             {isGrid ? (
               // ── SERVICE GRID ───────────────────────────────────────────
               <div className="grid-safe">
@@ -630,6 +617,9 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
                 })}
               </div>
             )}
+            <div className="form-actions form-actions--single">
+              <BackBtn onClick={() => setSelectedCategory(null)} label={t('changeCategory')} />
+            </div>
           </>
         )}
       </div>
@@ -691,13 +681,6 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
             </div>
           </div>
         </div>
-        <button onClick={handleChangeService} style={{
-          background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0,
-          fontSize: 12, fontWeight: 700, color: 'var(--text-3)', fontFamily: 'var(--font)',
-          padding: '4px 8px', borderRadius: 6, whiteSpace: 'nowrap', alignSelf: 'flex-start',
-        }}>
-          {t('changeService')}
-        </button>
       </div>
 
       <h2 style={{ fontSize: 21, fontWeight: 800, color: 'var(--text)', marginBottom: 20, letterSpacing: '-0.01em', lineHeight: 1.3, wordBreak: 'break-word' }}>
@@ -874,6 +857,10 @@ export default function StepSlots({ onSelect, guidePick, onGuidePickConsumed }) 
             {t('clickHint')}
           </div>
         )}
+      </div>
+
+      <div className="form-actions form-actions--single">
+        <BackBtn onClick={handleChangeService} label={t('changeService')} />
       </div>
     </div>
   )

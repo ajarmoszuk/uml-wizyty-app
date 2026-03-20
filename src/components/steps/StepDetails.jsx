@@ -2,10 +2,20 @@ import React, { useState } from 'react'
 import { useT, useLang, useDobHint, useServiceLabel, useOfficeLabel } from '../../i18n'
 import { googleMapsUrl } from '../../utils/googleMaps.js'
 import Icon from '../ui/Icon.jsx'
+import ConsentBox from '../ui/ConsentBox.jsx'
 
 const STORAGE_KEY = 'uml_user_data'
 function loadSaved() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}') } catch { return {} }
+}
+
+/** Migrate old single `notificationType` to independent email / SMS toggles (API accepts both). */
+function loadNotificationPrefs(raw) {
+  if (typeof raw.notifyEmail === 'boolean' && typeof raw.notifySms === 'boolean') {
+    return { notifyEmail: raw.notifyEmail, notifySms: raw.notifySms }
+  }
+  if (raw.notificationType === 'sms') return { notifyEmail: false, notifySms: true }
+  return { notifyEmail: true, notifySms: false }
 }
 
 function formatDateLong(dateStr, lang) {
@@ -33,20 +43,32 @@ export default function StepDetails({ booking, onNext, onBack }) {
   const svcLabel = useServiceLabel()
   const officeLabel = useOfficeLabel()
   const { lang } = useLang()
-  const saved = loadSaved()
-  const [form, setForm] = useState({
-    name: saved.name || '',
-    phone: saved.phone || '',
-    dateOfBirth: saved.dateOfBirth || '',
-    email: saved.email || '',
-    notificationType: saved.notificationType || 'email',
+  const [form, setForm] = useState(() => {
+    const saved = loadSaved()
+    const n = loadNotificationPrefs(saved)
+    return {
+      name: saved.name || '',
+      phone: saved.phone || '',
+      dateOfBirth: saved.dateOfBirth || '',
+      email: saved.email || '',
+      notifyEmail: n.notifyEmail,
+      notifySms: n.notifySms,
+    }
   })
   const [errors, setErrors] = useState({})
   const [saveData, setSaveData] = useState(true)
+  const [terms1, setTerms1] = useState(false)
+  const [terms2, setTerms2] = useState(false)
+  const [termsError, setTermsError] = useState(false)
 
   function set(k, v) {
     setForm(f => ({ ...f, [k]: v }))
     setErrors(e => ({ ...e, [k]: null }))
+  }
+
+  function toggleNotify(key) {
+    setForm((f) => ({ ...f, [key]: !f[key] }))
+    setErrors((e) => ({ ...e, notification: null }))
   }
 
   function validate() {
@@ -55,12 +77,21 @@ export default function StepDetails({ booking, onNext, onBack }) {
     if (!/^\d{9}$/.test(form.phone.replace(/\s/g, ''))) e.phone = t('phoneError')
     if (!/^\d{4}-\d{2}-\d{2}$/.test(form.dateOfBirth)) e.dateOfBirth = t('dobError')
     if (!form.email.includes('@')) e.email = t('emailError')
+    if (!form.notifyEmail && !form.notifySms) e.notification = t('notifRequired')
     return e
   }
 
   function handleSubmit() {
     const e = validate()
-    if (Object.keys(e).length) { setErrors(e); return }
+    if (Object.keys(e).length) {
+      setErrors(e)
+      return
+    }
+    if (!terms1 || !terms2) {
+      setTermsError(true)
+      return
+    }
+    setTermsError(false)
     if (saveData) localStorage.setItem(STORAGE_KEY, JSON.stringify(form))
     onNext(form)
   }
@@ -207,37 +238,107 @@ export default function StepDetails({ booking, onNext, onBack }) {
           />
         </Field>
 
-        {/* Notification type */}
-        <Field id="field-notif" label={t('notifLabel')}>
-          <div role="group" aria-label={t('notifLabel')} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {[{ val: 'email', icon: 'mail', label: 'E-mail' }, { val: 'sms', icon: 'smartphone', label: 'SMS' }].map(opt => (
-              <button key={opt.val} onClick={() => set('notificationType', opt.val)}
-                aria-pressed={form.notificationType === opt.val}
-                style={{
-                  flex: '1 1 140px',
-                  minWidth: 'min(100%, 140px)',
-                  padding: '12px 16px',
-                  border: `2px solid ${form.notificationType === opt.val ? 'var(--accent)' : 'var(--border)'}`,
-                  borderRadius: 10,
-                  background: form.notificationType === opt.val ? 'var(--accent-light)' : 'var(--surface2)',
-                  color: form.notificationType === opt.val ? 'var(--accent)' : 'var(--text-2)',
-                  fontFamily: 'var(--font)',
-                  fontSize: 15, fontWeight: 700,
-                  cursor: 'pointer', transition: 'all var(--transition)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                }}>
-                <Icon name={opt.icon} size={16} /> {opt.label}
-              </button>
-            ))}
+        {/* Notification channels — same pill UI as before; both can be on (checkbox-like, API array) */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
+            <span style={{ fontWeight: 800, fontSize: 15, color: 'var(--text)' }}>{t('notifLabel')}</span>
           </div>
-        </Field>
+          {errors.notification && (
+            <p role="alert" style={{ fontWeight: 600, color: 'var(--red)', marginBottom: 8, fontSize: 13, display: 'flex', alignItems: 'center', gap: 4 }}>
+              <Icon name="alert" size={14} /> {errors.notification}
+            </p>
+          )}
+          <div role="group" aria-label={t('notifLabel')} style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => toggleNotify('notifyEmail')}
+              aria-pressed={form.notifyEmail}
+              style={{
+                flex: '1 1 140px',
+                minWidth: 'min(100%, 140px)',
+                padding: '12px 16px',
+                border: `2px solid ${form.notifyEmail ? 'var(--accent)' : 'var(--border)'}`,
+                borderRadius: 10,
+                background: form.notifyEmail ? 'var(--accent-light)' : 'var(--surface2)',
+                color: form.notifyEmail ? 'var(--accent)' : 'var(--text-2)',
+                fontFamily: 'var(--font)',
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all var(--transition)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+              }}
+            >
+              <Icon name="mail" size={16} aria-hidden /> {t('notifChannelEmail')}
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleNotify('notifySms')}
+              aria-pressed={form.notifySms}
+              style={{
+                flex: '1 1 140px',
+                minWidth: 'min(100%, 140px)',
+                padding: '12px 16px',
+                border: `2px solid ${form.notifySms ? 'var(--accent)' : 'var(--border)'}`,
+                borderRadius: 10,
+                background: form.notifySms ? 'var(--accent-light)' : 'var(--surface2)',
+                color: form.notifySms ? 'var(--accent)' : 'var(--text-2)',
+                fontFamily: 'var(--font)',
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all var(--transition)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+              }}
+            >
+              <Icon name="smartphone" size={16} aria-hidden /> {t('notifChannelSms')}
+            </button>
+          </div>
+        </div>
 
         {/* Remember me */}
         <label style={{ display: 'flex', gap: 10, alignItems: 'flex-start', cursor: 'pointer', fontSize: 14, color: 'var(--text-2)', userSelect: 'none', lineHeight: 1.4 }}>
           <input type="checkbox" checked={saveData} onChange={e => setSaveData(e.target.checked)}
-            style={{ width: 18, height: 18, accentColor: 'var(--accent)', cursor: 'pointer', marginTop: 1, flexShrink: 0 }} />
+            className="uml-checkbox uml-checkbox--sm" />
           {t('saveData')}
         </label>
+      </div>
+
+      {/* Legal consents — same as official form, before continuing to SMS verification */}
+      <div className="consent-section" role="group" aria-label={t('consentSectionTitle')}>
+        <ConsentBox
+          id="details-terms1"
+          checked={terms1}
+          onChange={(v) => {
+            setTerms1(v)
+            if (v) setTermsError(false)
+          }}
+          highlight={termsError && !terms1}
+        >
+          {t('terms1')}
+        </ConsentBox>
+        <ConsentBox
+          id="details-terms2"
+          checked={terms2}
+          onChange={(v) => {
+            setTerms2(v)
+            if (v) setTermsError(false)
+          }}
+          highlight={termsError && !terms2}
+        >
+          {t('terms2')}
+        </ConsentBox>
+        {termsError && (
+          <p role="alert" className="consent-section__error">
+            <Icon name="alert" size={14} aria-hidden /> {t('termsRequired')}
+          </p>
+        )}
       </div>
 
       <div className="form-actions">
@@ -308,17 +409,26 @@ export const primaryBtn = {
 export function BackBtn({ onClick, label }) {
   const t = useT()
   return (
-    <button onClick={onClick} style={{
-      padding: '15px 20px',
-      background: 'transparent',
-      color: 'var(--text-2)',
-      border: '1.5px solid var(--border)',
-      borderRadius: 12,
-      fontFamily: 'var(--font)',
-      fontWeight: 700,
-      fontSize: 15,
-      cursor: 'pointer',
-    }}>
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        padding: '15px 20px',
+        background: 'transparent',
+        color: 'var(--text-2)',
+        border: '1.5px solid var(--border)',
+        borderRadius: 12,
+        fontFamily: 'var(--font)',
+        fontWeight: 700,
+        fontSize: 15,
+        cursor: 'pointer',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 6,
+      }}
+    >
+      <Icon name="chevron-left" size={18} style={{ flexShrink: 0, opacity: 0.85 }} aria-hidden />
       {label || t('back')}
     </button>
   )

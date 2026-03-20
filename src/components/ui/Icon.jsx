@@ -20,6 +20,8 @@ import {
   FileStack, Home, Building, Umbrella, Sparkles,
   Hammer, Banknote, BadgeCheck,   ContactRound, Globe, CalendarClock,
   SquareArrowOutUpRight,
+  Contrast,
+  Type,
 } from 'lucide-react'
 
 const MAP = {
@@ -117,6 +119,8 @@ const MAP = {
   globe: Globe,
   'calendar-clock': CalendarClock,
   'square-arrow-out-up-right': SquareArrowOutUpRight,
+  contrast: Contrast,
+  type: Type,
 }
 
 export default function Icon({ name, size = 20, className, style, strokeWidth = 2, ...props }) {

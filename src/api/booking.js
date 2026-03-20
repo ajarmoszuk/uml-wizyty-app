@@ -584,8 +584,15 @@ export async function sendVerificationCode({ phone, branchId, serviceId, sedcoBr
 export async function takeAppointment({
   sedcoBranch, sedcoService, branchId, serviceId,
   appointmentDay, appointmentTime,
-  name, phone, verificationCode, dateOfBirth, email, notificationType,
+  name, phone, verificationCode, dateOfBirth, email,
+  notifyEmail,
+  notifySms,
 }) {
+  const notificationTypes = []
+  if (notifyEmail) notificationTypes.push('email')
+  if (notifySms) notificationTypes.push('sms')
+  const notificationTypePayload = notificationTypes.length ? notificationTypes : ['email']
+
   const payload = JSON.stringify({
     SedcoBranchID: sedcoBranch,
     SedcoServiceID: sedcoService,
@@ -600,7 +607,7 @@ export async function takeAppointment({
         verificationCode,
         DateOfBirth: dateOfBirth,
         Email: email,
-        NotificationType: notificationType ? [notificationType] : ['email'],
+        NotificationType: notificationTypePayload,
         checkbox: true,
         checkbox2: true,
       }

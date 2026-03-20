@@ -13,9 +13,6 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
   const [cooldown, setCooldown] = useState(0)
-  const [terms1, setTerms1] = useState(false)
-  const [terms2, setTerms2] = useState(false)
-  const [termsError, setTermsError] = useState(false)
   const inputRefs = [useRef(), useRef(), useRef(), useRef()]
 
   useEffect(() => {
@@ -25,8 +22,6 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
   }, [cooldown])
 
   async function handleSend() {
-    if (!terms1 || !terms2) { setTermsError(true); return }
-    setTermsError(false)
     setLoading(true); setError(null)
     try {
       await sendVerificationCode({
@@ -77,7 +72,8 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
         verificationCode: fullCode,
         dateOfBirth: details.dateOfBirth,
         email: details.email,
-        notificationType: details.notificationType,
+        notifyEmail: details.notifyEmail,
+        notifySms: details.notifySms,
       })
       onSuccess(ticket)
     } catch(e) {
@@ -144,31 +140,6 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
             <div style={{ fontSize: 26, fontWeight: 900, color: 'var(--text)', letterSpacing: '0.06em' }}>
               +48 {details.phone}
             </div>
-          </div>
-
-          {/* Consent checkboxes */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
-            <ConsentBox
-              id="terms1"
-              checked={terms1}
-              onChange={v => { setTerms1(v); if (v) setTermsError(false) }}
-              highlight={termsError && !terms1}
-            >
-              {t('terms1')}
-            </ConsentBox>
-            <ConsentBox
-              id="terms2"
-              checked={terms2}
-              onChange={v => { setTerms2(v); if (v) setTermsError(false) }}
-              highlight={termsError && !terms2}
-            >
-              {t('terms2')}
-            </ConsentBox>
-            {termsError && (
-              <p role="alert" style={{ fontSize: 13, color: 'var(--red)', fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: 4 }}>
-                <Icon name="alert" size={14} /> {t('termsRequired')}
-              </p>
-            )}
           </div>
 
           {error && <ErrorBanner>{error}</ErrorBanner>}
@@ -242,31 +213,6 @@ export default function StepVerify({ booking, details, onSuccess, onBack }) {
         </>
       )}
     </div>
-  )
-}
-
-function ConsentBox({ id, checked, onChange, highlight, children }) {
-  return (
-    <label htmlFor={id} style={{
-      display: 'flex', gap: 12, alignItems: 'flex-start', cursor: 'pointer',
-      background: highlight ? 'var(--red-light)' : 'var(--surface2)',
-      border: `1.5px solid ${highlight ? 'var(--red)' : 'var(--border)'}`,
-      borderRadius: 10, padding: '12px 14px',
-      transition: 'border-color var(--transition), background var(--transition)',
-      userSelect: 'none',
-    }}>
-      <input
-        id={id}
-        type="checkbox"
-        checked={checked}
-        onChange={e => onChange(e.target.checked)}
-        aria-required="true"
-        style={{ width: 18, height: 18, marginTop: 2, accentColor: 'var(--accent)', flexShrink: 0, cursor: 'pointer' }}
-      />
-      <span style={{ fontSize: 12, color: 'var(--text-2)', lineHeight: 1.6 }}>
-        {children}
-      </span>
-    </label>
   )
 }
 

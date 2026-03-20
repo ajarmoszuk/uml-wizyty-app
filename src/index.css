@@ -51,6 +51,77 @@
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.5);
 }
 
+/* ── User toggles: high contrast (UML-inspired intent, UML Wizyty palette) ── */
+html[data-a11y-contrast="true"][data-theme="light"] {
+  --bg: #faf9f7;
+  --surface: #ffffff;
+  --surface2: #ebe8e4;
+  --border: #1c1917;
+  --border-dark: #000000;
+  --text: #0c0a09;
+  --text-2: #1c1917;
+  --text-3: #292524;
+  --accent: #1d4ed8;
+  --accent-light: #dbeafe;
+  --accent-hover: #1e40af;
+  --green: #047857;
+  --green-light: #d1fae5;
+  --red: #b91c1c;
+  --red-light: #fee2e2;
+  --orange: #c2410c;
+  --orange-light: #ffedd5;
+  --shadow: 0 2px 0 rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 4px 24px rgba(0, 0, 0, 0.18);
+}
+html[data-a11y-contrast="true"][data-theme="dark"] {
+  --bg: #000000;
+  --surface: #0c0c0e;
+  --surface2: #18181b;
+  --border: #f4f4f5;
+  --border-dark: #ffffff;
+  --text: #fafafa;
+  --text-2: #e4e4e7;
+  --text-3: #d4d4d8;
+  --accent: #60a5fa;
+  --accent-light: #172554;
+  --accent-hover: #93c5fd;
+  --green: #4ade80;
+  --green-light: #052e16;
+  --red: #fca5a5;
+  --red-light: #450a0a;
+  --orange: #fcd34d;
+  --orange-light: #422006;
+  --modal-overlay: rgba(0, 0, 0, 0.85);
+  --shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.75);
+}
+
+/* Readable: larger type everywhere — most UI uses inline px font sizes, so they don’t inherit
+   from html; zoom on .app-root scales text, icons, and controls together (like OS zoom). */
+html[data-a11y-readable="true"] body {
+  line-height: 1.65;
+}
+html[data-a11y-readable="true"] .app-root {
+  zoom: 1.1;
+}
+/* Fallback when zoom isn’t available: bump root rem (helps rem-based bits; inline px still limited) */
+@supports not (zoom: 1.1) {
+  html[data-a11y-readable="true"] {
+    font-size: clamp(18px, 3.6vw, 22px);
+  }
+}
+html[data-a11y-readable="true"] .card-padding {
+  padding: clamp(20px, 5.5vw, 36px) clamp(14px, 4.5vw, 32px);
+}
+html[data-a11y-readable="true"] .booking-rules__text,
+html[data-a11y-readable="true"] .consent-box__text {
+  line-height: 1.65;
+}
+html[data-a11y-contrast="true"] :focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
 html {
   font-size: clamp(15px, 2.8vw, 17px);
   overflow-x: hidden;
@@ -161,6 +232,40 @@ body {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+}
+.top-bar__a11y {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-right: 4px;
+  margin-right: 2px;
+  border-right: 1px solid var(--border);
+}
+.top-bar__a11y-btn {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  color: var(--text-2);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  flex-shrink: 0;
+}
+.top-bar__a11y-btn[aria-pressed="true"] {
+  background: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.top-bar__a11y-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 1;
 }
 .top-bar__action {
   display: flex;
@@ -821,6 +926,103 @@ body {
   margin-top: 4px;
 }
 
+/* Legal consents (StepDetails) — readable, like official form but clearer hierarchy */
+.consent-section {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.consent-box {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  cursor: pointer;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+  user-select: none;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+.consent-box--error {
+  background: var(--red-light);
+  border-color: var(--red);
+}
+/* Custom checkboxes — light/dark surface when unchecked (native controls read as black on macOS light) */
+.uml-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  margin: 0;
+  flex-shrink: 0;
+  border: 2px solid var(--border-dark);
+  border-radius: 5px;
+  background-color: var(--surface);
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    border-color var(--transition),
+    box-shadow var(--transition);
+}
+.uml-checkbox--sm {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  margin-top: 1px;
+  border-radius: 4px;
+}
+.consent-box .uml-checkbox {
+  margin-top: 2px;
+}
+.uml-checkbox:hover {
+  border-color: var(--text-3);
+}
+.uml-checkbox:checked {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+  background-size: 14px;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.uml-checkbox:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (forced-colors: active) {
+  .uml-checkbox {
+    appearance: auto;
+    -webkit-appearance: auto;
+    background-color: Field;
+    border-color: ButtonBorder;
+  }
+  .uml-checkbox:checked {
+    background-image: none;
+    accent-color: var(--accent);
+  }
+}
+.consent-box__text {
+  font-size: clamp(13px, 3.4vw, 14px);
+  color: var(--text-2);
+  line-height: 1.55;
+  font-weight: 600;
+}
+.consent-section__error {
+  font-size: 13px;
+  color: var(--red);
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 /* Calendar: keep 7 columns but allow shrinking */
 .cal-week {
   display: grid;
@@ -902,6 +1104,14 @@ body {
 .form-actions > button {
   flex: 1 1 140px;
   min-width: min(100%, 140px);
+}
+/* Single back row (StepSlots substeps) — don’t stretch one button full width */
+.form-actions--single {
+  justify-content: flex-start;
+}
+.form-actions--single > button {
+  flex: 0 1 auto;
+  min-width: min(100%, 280px);
 }
 
 /* SMS code inputs */

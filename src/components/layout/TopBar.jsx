@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLang, useTheme, useT } from '../../i18n'
+import { useLang, useTheme, useT, useA11y } from '../../i18n'
 import AboutModal from './AboutModal.jsx'
 import OfficeGuideModal from './OfficeGuideModal.jsx'
 import Icon from '../ui/Icon.jsx'
@@ -45,6 +45,7 @@ function MoonIcon() {
 export default function TopBar() {
   const { lang, setLang } = useLang()
   const { dark, setDark } = useTheme()
+  const { readable, setReadable, highContrast, setHighContrast } = useA11y()
   const t = useT()
   const [showAbout, setShowAbout] = useState(false)
   const [showOfficeGuide, setShowOfficeGuide] = useState(false)
@@ -132,6 +133,28 @@ export default function TopBar() {
         </div>
 
         <div className="top-bar__tools">
+          <div className="top-bar__a11y" role="group" aria-label={t('a11yGroupLabel')}>
+            <button
+              type="button"
+              className="top-bar__a11y-btn"
+              onClick={() => setReadable((r) => !r)}
+              aria-pressed={readable}
+              aria-label={t('a11yReadable')}
+              title={t('a11yReadableTitle')}
+            >
+              <Icon name="type" size={19} />
+            </button>
+            <button
+              type="button"
+              className="top-bar__a11y-btn"
+              onClick={() => setHighContrast((c) => !c)}
+              aria-pressed={highContrast}
+              aria-label={t('a11yContrast')}
+              title={t('a11yContrastTitle')}
+            >
+              <Icon name="contrast" size={19} />
+            </button>
+          </div>
           <button
             type="button"
             onClick={() => setDark(!dark)}
