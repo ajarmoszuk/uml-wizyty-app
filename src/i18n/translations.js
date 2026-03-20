@@ -93,7 +93,14 @@ export const T = {
     a11yContrast: 'Kontrast',
     a11yContrastTitle: 'Wyższy kontrast kolorów i wyraźniejsze obramowania',
     codeDigit: (i) => `Cyfra ${i + 1} z 4`,
-    dayAvail: (n) => `${n} wolnych miejsc`,
+    /** Polish: miejsce / miejsca / miejsc + wolne / wolnych (same pattern as officesBadge) */
+    dayAvail: (n) => {
+      if (n === 1) return '1 wolne miejsce'
+      const mod10 = n % 10
+      const mod100 = n % 100
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} wolne miejsca`
+      return `${n} wolnych miejsc`
+    },
     dayNone: 'Brak wolnych miejsc',
     checkingSlots: 'Sprawdzam dostępne terminy…',
     availableHours: 'Dostępne godziny',
@@ -111,7 +118,13 @@ export const T = {
     openOfficialBooking: 'Otwórz wizyty.uml.lodz.pl',
     dayLoadFailed: 'Brak danych z serwera — odśwież kalendarz',
     slot1: '1 miejsce',
-    slotsN: (n) => `${n} miejsc`,
+    slotsN: (n) => {
+      if (n === 1) return '1 miejsce'
+      const mod10 = n % 10
+      const mod100 = n % 100
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} miejsca`
+      return `${n} miejsc`
+    },
 
     // details
     yourSlot: 'Twój wybrany termin',
@@ -479,7 +492,13 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     a11yContrast: 'Контраст',
     a11yContrastTitle: 'Сильніші кольори та межі для чіткості',
     codeDigit: (i) => `Цифра ${i + 1} з 4`,
-    dayAvail: (n) => `${n} вільних місць`,
+    dayAvail: (n) => {
+      if (n === 1) return '1 вільне місце'
+      const mod10 = n % 10
+      const mod100 = n % 100
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} вільні місця`
+      return `${n} вільних місць`
+    },
     dayNone: 'Немає вільних місць',
     checkingSlots: 'Перевіряємо вільні терміни…',
     availableHours: 'Доступний час',
@@ -497,7 +516,13 @@ This project is an unofficial, open-source wrapper that talks to the same city s
     openOfficialBooking: 'Відкрити wizyty.uml.lodz.pl',
     dayLoadFailed: 'Немає даних із сервера — оновіть календар',
     slot1: '1 місце',
-    slotsN: (n) => `${n} місць`,
+    slotsN: (n) => {
+      if (n === 1) return '1 місце'
+      const mod10 = n % 10
+      const mod100 = n % 100
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} місця`
+      return `${n} місць`
+    },
 
     yourSlot: 'Обраний вами час',
     enterDetails: 'Заповніть дані',
