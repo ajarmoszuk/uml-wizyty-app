@@ -2,9 +2,20 @@ import React, { useState, useEffect } from 'react'
 import { useLang, useTheme, useT, useA11y } from '../../i18n'
 import AboutModal from './AboutModal.jsx'
 import OfficeGuideModal from './OfficeGuideModal.jsx'
+import EntryNoticeModal from './EntryNoticeModal.jsx'
 import Icon from '../ui/Icon.jsx'
 
 const GITHUB_URL = 'https://github.com/ajarmoszuk/uml-wizyty-app'
+
+const ENTRY_NOTICE_SESSION_KEY = 'uml_entry_notice_dismissed_v2'
+
+function entryNoticeWasDismissedThisSession() {
+  try {
+    return sessionStorage.getItem(ENTRY_NOTICE_SESSION_KEY) === '1'
+  } catch {
+    return false
+  }
+}
 
 const LANGS = [
   { code: 'pl', flag: '🇵🇱', label: 'Polish', short: 'PL' },
@@ -49,6 +60,9 @@ export default function TopBar() {
   const t = useT()
   const [showAbout, setShowAbout] = useState(false)
   const [showOfficeGuide, setShowOfficeGuide] = useState(false)
+  const [showEntryNotice, setShowEntryNotice] = useState(
+    () => !entryNoticeWasDismissedThisSession(),
+  )
   const [compactTopBar, setCompactTopBar] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia(COMPACT_TOPBAR_MQ).matches,
   )
@@ -72,6 +86,13 @@ export default function TopBar() {
     window.addEventListener('uml:openofficeguide', open)
     return () => window.removeEventListener('uml:openofficeguide', open)
   }, [])
+
+  function dismissEntryNotice() {
+    try {
+      sessionStorage.setItem(ENTRY_NOTICE_SESSION_KEY, '1')
+    } catch { /* ignore */ }
+    setShowEntryNotice(false)
+  }
 
   const iconBtn = {
     display: 'flex',
@@ -194,6 +215,7 @@ export default function TopBar() {
 
       {showOfficeGuide && <OfficeGuideModal onClose={() => setShowOfficeGuide(false)} />}
       {showAbout && <AboutModal onClose={() => setShowAbout(false)} />}
+      {showEntryNotice && <EntryNoticeModal onClose={dismissEntryNotice} />}
     </>
   )
 }

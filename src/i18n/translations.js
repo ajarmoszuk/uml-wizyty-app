@@ -218,6 +218,14 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     viewModeList: 'Lista',
     commitLinkTitle: 'Ten commit na GitHubie (nowa karta)',
     sourceCode: 'Kod źródłowy na GitHub',
+    entryNoticeTitle: 'Komunikat dotyczący projektu i dostępności',
+    entryNoticeBody: `Informuję, że przekazane publicznie przez miasto informacje na temat tego projektu nie oddają pełnego obrazu sytuacji. Wkrótce przedstawię swoje stanowisko w tej sprawie.
+
+Z przyczyn technicznych ta witryna nie może obecnie łączyć się z serwerami rezerwacji Urzędu Miasta Łodzi: dostęp z infrastruktury Vercel do API został zablokowany po stronie miasta. W efekcie publicznie hostowana wersja aplikacji przestała działać.
+
+Jeśli chcesz nadal skorzystać z tego narzędzia do rezerwacji, możesz pobrać kod źródłowy z GitHuba, zbudować projekt lokalnie i uruchomić go u siebie — w takiej konfiguracji połączenie z serwerem urzędu działa prawidłowo.`,
+    entryNoticeGithubIntro: 'Repozytorium projektu (szczegóły i uruchomienie w README):',
+    entryNoticeCta: 'Zamknij',
     close: 'Zamknij',
   },
 
