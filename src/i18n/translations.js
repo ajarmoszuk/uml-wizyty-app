@@ -219,11 +219,22 @@ Ten projekt to nieoficjalny, open-source wrapper — rozmawia z tymi samymi serw
     commitLinkTitle: 'Ten commit na GitHubie (nowa karta)',
     sourceCode: 'Kod źródłowy na GitHub',
     entryNoticeTitle: 'Komunikat dotyczący projektu i dostępności',
-    entryNoticeBody: `Informuję, że przekazane publicznie przez miasto informacje na temat tego projektu nie oddają pełnego obrazu sytuacji. Wkrótce przedstawię swoje stanowisko w tej sprawie.
+    entryNoticeFacebookPostIntro: 'Post Urzędu Miasta Łodzi na Facebooku (treść, o której mowa poniżej):',
+    entryNoticeFacebookPostUrl:
+      'https://www.facebook.com/lodzpolska/posts/pfbid0xbxuw3VXzC6AjZJ9MU9mjvpiE51S2jEyYzcsT934dVh8sJZLm9Q3GVwYVVUrw2QFl',
+    entryNoticeBody: `Jestem autorem aplikacji webowej, o której mowa w powyższym poście. Strona od początku jawnie informuje, że jest nieoficjalna; baner na górze brzmi: „To nie jest strona Urzędu Miasta Łodzi — nieoficjalna strona pomocnicza do rezerwacji.” Tę informację widać zresztą na zrzucie ekranu opublikowanym przez UMŁ tuż pod czerwonym X.
 
-Z przyczyn technicznych ta witryna nie może obecnie łączyć się z serwerami rezerwacji Urzędu Miasta Łodzi: dostęp z infrastruktury Vercel do API został zablokowany po stronie miasta. W efekcie publicznie hostowana wersja aplikacji przestała działać.
+To niekomercyjny projekt open source. Cały kod jest publicznie dostępny na GitHubie (github.com/ajarmoszuk/uml-wizyty-app) — każdy, w tym pracownicy IT urzędu, może go przejrzeć i zweryfikować. Strona działa wyłącznie jako pośrednik: zapytania trafiają bezpośrednio na serwery wizyty.uml.lodz.pl, nic nie jest zatrzymywane ani zapisywane. Nie ma żadnej bazy danych, nie są logowane dane osobowe.
 
-Jeśli chcesz nadal skorzystać z tego narzędzia do rezerwacji, możesz pobrać kod źródłowy z GitHuba, zbudować projekt lokalnie i uruchomić go u siebie — w takiej konfiguracji połączenie z serwerem urzędu działa prawidłowo.`,
+Projekt powstał, bo oficjalny interfejs był dla mnie trudny w obsłudze — stworzyłem prostsze narzędzie dla siebie i udostępniłem je publicznie, żeby pomóc innym w tej samej sytuacji.
+
+Strona aktualnie nie działa, dlatego że miasto zdecydowało się zablokować infrastrukturę, na której była hostowana. Nie mam ochoty (ani czasu) o to walczyć. Jeśli ktoś chce, może samodzielnie uruchomić aplikację na własnym serwerze lub komputerze — instrukcje są w repozytorium.
+
+W stopce strony widoczny jest unikalny identyfikator aktualnej wersji aplikacji ({{COMMIT}}), który pozwala każdemu zweryfikować, że kod działający na żywo był dokładnie tym samym, co publicznie dostępny na GitHubie.
+
+Rozumiem, że miasto musiało zareagować na zgłoszenie i nie mam o to pretensji. Sytuację można jednak wyjaśnić i zamknąć spokojnie.
+
+Nadal czekam na kontakt zwrotny z ich strony. Jedynie o co proszę, to o sprostowanie przez miasto — nie czuję się dobrze, będąc nazywany oszustem, kiedy chciałem pomóc innym mieszkańcom zupełnie bezinteresownie.`,
     entryNoticeGithubIntro: 'Repozytorium projektu (szczegóły i uruchomienie w README):',
     entryNoticeCta: 'Zamknij',
     close: 'Zamknij',

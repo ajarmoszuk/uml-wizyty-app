@@ -46,7 +46,7 @@ export default function EntryNoticeModal({ onClose }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="entry-notice-title"
-      aria-describedby="entry-notice-body"
+      aria-describedby="entry-notice-fb entry-notice-body"
       style={{
         position: 'fixed',
         inset: 0,
@@ -70,7 +70,7 @@ export default function EntryNoticeModal({ onClose }) {
           boxShadow: 'var(--shadow-lg)',
           width: '100%',
           maxWidth: 'min(540px, calc(100vw - 24px))',
-          maxHeight: 'min(85vh, 640px)',
+          maxHeight: 'min(90vh, 900px)',
           overflowY: 'auto',
           padding: 'clamp(20px, 5vw, 28px) clamp(16px, 4vw, 28px)',
           boxSizing: 'border-box',
@@ -138,6 +138,31 @@ export default function EntryNoticeModal({ onClose }) {
           </button>
         </div>
 
+        <p id="entry-notice-fb" style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)', margin: '0 0 6px' }}>
+          {pl.entryNoticeFacebookPostIntro}
+        </p>
+        <p style={{ margin: '0 0 18px', wordBreak: 'break-all' }}>
+          <a
+            href={pl.entryNoticeFacebookPostUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'var(--accent)',
+              fontWeight: 700,
+              fontSize: 14,
+              textDecoration: 'none',
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.textDecoration = 'underline'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.textDecoration = 'none'
+            }}
+          >
+            {pl.entryNoticeFacebookPostUrl}
+          </a>
+        </p>
+
         <div
           id="entry-notice-body"
           style={{
@@ -149,7 +174,7 @@ export default function EntryNoticeModal({ onClose }) {
             whiteSpace: 'pre-line',
           }}
         >
-          {pl.entryNoticeBody}
+          {pl.entryNoticeBody.replace(/\{\{COMMIT\}\}/g, __GIT_COMMIT__)}
         </div>
 
         <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)', margin: '0 0 6px' }}>
